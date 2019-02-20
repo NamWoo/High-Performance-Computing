@@ -157,9 +157,33 @@ qsub: job 1914731.pbs ready
 
 
 
+## 계층구조
 
+```
+[sedu07@node8289 sedu07]$ ls /
+applic    bin   dev     home      lib    media  proc  run      scratch_ime  tftpboot  var
+apps      boot  etc     home01    lib64  mnt    root  sbin     srv          tmp
+apps_ime  cm    global  home_ime  local  opt    rpms  scratch  sys          usr
+[sedu07@node8289 sedu07]$
 
+```
 
+root의 계념은 / , 윈도우로따지면 c:// 같은거.
+
+## 명령어 구조
+
+* command + options + arguments
+
+```rinux
+[sedu07@node8289 sedu07]$ ls /home01/sedu07
+job_examples
+[sedu07@node8289 sedu07]$ ls -a /home01/sedu07
+.   .bash_history  .bash_profile  .cache   .emacs        .kshrc    .openstackrc  .vim      .Xauthority
+..  .bash_logout   .bashrc        .config  job_examples  .mozilla  .ssh          .viminfo
+[sedu07@node8289 sedu07]$
+```
+
+/루트 밑 home01 밑에 / 또 뭐 밑에 있는 경로에 파일들을 보고 싶다
 
 
 
