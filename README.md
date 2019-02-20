@@ -622,45 +622,279 @@ aaa
 ### cat 실행.
 간단한 파일일때 사용가능
 ### echo 화면 출력
+환경변수에 있는 변수 값 출력
 
 ```
 [sedu07@node8289 sedu07]$ echo $HOME
 /home01/sedu07
 ```
 
+## 다시 시작
+
+### cat
+### diff
+
+
+
+```
+[sedu07@login01 ~]$ cd /scratch/sedu07
+[sedu07@login01 sedu07]$ qsub -I -V -l select=1 -l walltime=04:00:00 -q debug
+qsub: waiting for job 1916494.pbs to start
+qsub: job 1916494.pbs ready
+
+[sedu07@node8282 ~]$ ls
+job_examples
+[sedu07@node8282 ~]$ mkdir aaa
+[sedu07@node8282 ~]$ cd aa
+-bash: cd: aa: No such file or directory
+[sedu07@node8282 ~]$ cd aaa
+[sedu07@node8282 aaa]$ cat > my1.txt
+i wanna go home.
+No way.^C
+[sedu07@node8282 aaa]$ cat > my2.txt
+i used to think that i could not go on.
+No way.^C
+[sedu07@node8282 aaa]$ cat my1.txt
+i wanna go home.
+[sedu07@node8282 aaa]$ cat my2.txt
+i used to think that i could not go on.
+[sedu07@node8282 aaa]$ cat my1.txt
+i wanna go home.
+[sedu07@node8282 aaa]$ cat > my1.txt
+aaa
+bbb
+^C
+[sedu07@node8282 aaa]$ cat > my2.txt
+ccc
+bbb
+^C
+[sedu07@node8282 aaa]$ cat my1.txt
+aaa
+bbb
+[sedu07@node8282 aaa]$ diff my1.txt my2.txt
+1c1
+< aaa
+---
+> ccc
+[sedu07@node8282 aaa]$ ^C
+
+
+```
+
+
+### vimdiff my1.txt my2.txt
+
+vim 에서 두창 모두 불러올 때
+* qa 하면 나갈 수 있다 q는 나가는거 a는 모두 닫는거 
+혹시 수정했을 때 안될 때는 w하고 qa
+
+### head and tail
+
+#### head
+```
+[sedu07@node8282 aaa]$ head /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+```
+#### tail
+```
+[sedu07@node8282 aaa]$ tail /etc/passwd
+jaltorf:x:1025:1025:jaltorf:/home/jaltorf:/bin/bash
+crayadm:x:1001:1001:crayadm:/home/crayadm:/bin/bash
+ddnadm:x:1029:1029:ddnadm:/home/ddnadm:/bin/bash
+brightadm:x:1030:1030:brightadm:/home/brightadm:/bin/bash
+bskim:x:1026:1002:bskim:/home/bskim:/bin/bash
+craybmt:x:1027:1002:craybmt:/home/craybmt:/bin/bash
+
+```
+
+#### `$ head -3 /etc/passwd`
+3줄만 보고 싶을 때
+```
+[sedu07@node8282 aaa]$ head -3 /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+
+```
+### tail 실제 사용시에는 
+반복돌릴 때 append로 쌓이는 가장 밑에 쌓이는 내용을 바뀔 때마다 출력할 수 있는 방법
+#### `$ tail -f my1.txt`
 
 
 
 
 
+### more 
+페이지 단위로 한 화면씩 출력하려고 할 때
+
+### wc
+줄 또는 단어 개수 출력
+
+#### -l 라인 수
+#### -w 단어 수
+#### -c 문자 수
+
+```
+[sedu07@node8282 aaa]$ ls -l
+total 8
+-rw-r--r-- 1 sedu07 in0163 8 Feb 20 13:45 my1.txt
+-rw-r--r-- 1 sedu07 in0163 8 Feb 20 13:42 my2.txt
+[sedu07@node8282 aaa]$ ls -l | wc -c
+108
+[sedu07@node8282 aaa]$ ls -l | wc -l
+3
+[sedu07@node8282 aaa]$ ls -l | wc -c
+108
+
+```
+
+### tar 압축과 묶어주는거
+$ tar -czvf test2.tgz test2
+```
+[sedu07@node8282 aaa]$ mkdir test2
+[sedu07@node8282 aaa]$ cp *.txt test2/
+[sedu07@node8282 aaa]$ cd test2
+[sedu07@node8282 test2]$ ls
+my1.txt  my2.txt
+[sedu07@node8282 test2]$ cd ..
+[sedu07@node8282 aaa]$ ls
+my1.txt  my2.txt  test2
+[sedu07@node8282 aaa]$ tar -czvf test2.tgz test2
+test2/
+test2/my1.txt
+test2/my2.txt
+[sedu07@node8282 aaa]$ ls
+my1.txt  my2.txt  test2  test2.tgz
+
+```
+
+### tar 압축해제
+-C 대문자 로 해체하는 폴더위치 지정가능
+
+```
+[sedu07@node8282 aaa]$ mkdir test3
+[sedu07@node8282 aaa]$ tar -xzvf test2.tgz -C test3/
+test2/
+test2/my1.txt
+test2/my2.txt
+[sedu07@node8282 aaa]$ ls
+my1.txt  my2.txt  test2  test2.tgz  test3
+
+```
+
+### gzip 은 압축
 
 
 
 
+## 절대와 상대 경로
+
+
+### chmod 권한 속성 변경
+
+```
+[sedu07@node8282 aaa]$ ls -l
+total 20
+-rw-r--r-- 1 sedu07 in0163    8 Feb 20 13:45 my1.txt
+-rw-r--r-- 1 sedu07 in0163    8 Feb 20 13:42 my2.txt
+drwxr-xr-x 2 sedu07 in0163 4096 Feb 20 13:59 test2
+-rw-r--r-- 1 sedu07 in0163  190 Feb 20 14:00 test2.tgz
+drwxr-xr-x 3 sedu07 in0163 4096 Feb 20 14:01 test3
+[sedu07@node8282 aaa]$ ls -l my1.txt
+-rw-r--r-- 1 sedu07 in0163 8 Feb 20 13:45 my1.txt
+[sedu07@node8282 aaa]$ chmod +x my1.txt
+[sedu07@node8282 aaa]$ ls -l my1.txt
+-rwxr-xr-x 1 sedu07 in0163 8 Feb 20 13:45 my1.txt
+
+```
+
+
+```
+[sedu07@node8282 aaa]$ ls -l my1.txt
+-rwxr-xr-x 1 sedu07 in0163 8 Feb 20 13:45 my1.txt
+[sedu07@node8282 aaa]$ chmod o+x my1.txt
+[sedu07@node8282 aaa]$ ls -l my1.txt
+-rwxr-xr-x 1 sedu07 in0163 8 Feb 20 13:45 my1.txt
+[sedu07@node8282 aaa]$
+
+```
 
 
 
+### 리다이렉팅 >
+#### >
+* ls > my3.txt
+
+my3.txt 파일에 ls 로 나오는 값들이 들어가게 되는.
+
+#### < >
+
+* text.x < input.dat > output.dat
+input dat를 불러와서 test.x를 실행하고 결과를 output.dat로 저장
+
+### find 찾기
+
+* $ find ./ -name my.txt
+find는 로그인노드에 루트 디렉토리에서 찾아버리면 부하가 상당히 걸리니 현재 디렉토리로 지정해줘야 한다.
+
+
+### ln 링크 명령어
+
+```
+[sedu07@node8282 aaa]$ cat >ori.txt
+ls
+Original file
+^C
+[sedu07@node8282 aaa]$ ls
+my1.txt  my2.txt  ori.txt  test2  test2.tgz  test3
+[sedu07@node8282 aaa]$ in -s ori.txt sym.txt
+-bash: syntax error near unexpected token `in'
+[sedu07@node8282 aaa]$ ln -s ori.txt sym.txt
+[sedu07@node8282 aaa]$ ls -l
+total 24
+-rwxr-xr-x 1 sedu07 in0163    8 Feb 20 13:45 my1.txt
+-rw-r--r-- 1 sedu07 in0163    8 Feb 20 13:42 my2.txt
+-rw-r--r-- 1 sedu07 in0163   17 Feb 20 14:34 ori.txt
+lrwxrwxrwx 1 sedu07 in0163    7 Feb 20 14:35 sym.txt -> ori.txt
+drwxr-xr-x 2 sedu07 in0163 4096 Feb 20 13:59 test2
+-rw-r--r-- 1 sedu07 in0163  190 Feb 20 14:00 test2.tgz
+drwxr-xr-x 3 sedu07 in0163 4096 Feb 20 14:01 test3
+[sedu07@node8282 aaa]$ cat ori.txt
+ls
+Original file
+[sedu07@node8282 aaa]$ cat sym.txt
+ls
+Original file
+
+```
+### 하드와 소프트링크
+
+소프트는 다순한 링크고
+하드링크는 연결에 업뎃되면 같이 업뎃
 
 
 
+### 프로세스
+#### 포그라운드
+일반적으로 쓰는 작업 `./pi.x `
+대기상태 다 끝날때까지 기다려야하는.
+#### 백그라운드
 
+백그라운드에서 실행 다른 작업 가능함.
+`./pi.x &`
 
+#### bg fg 
+중간에 멈춘 실행파일은 이어서 할 수 있게 
+* bg는 background
+* fg는 foreground
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+jobs
 
 
 
