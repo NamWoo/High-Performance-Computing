@@ -433,29 +433,200 @@ da로 시작하는 가장 최근 명령어 수행
 구분자 표현
 
 
+### alias 별칭? 단축키
+
+```
+[sedu07@node8289 sedu07]$ aliar
+-bash: aliar: command not found
+[sedu07@node8289 sedu07]$ alias
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+alias l.='ls -d .* --color=auto'
+alias ll='ls -l --color=auto'
+alias ls='ls --color=auto'
+alias vi='vim'
+alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
+[sedu07@node8289 sedu07]$ alias editor='vim'
+[sedu07@node8289 sedu07]$ alias
+alias editor='vim'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+alias l.='ls -d .* --color=auto'
+alias ll='ls -l --color=auto'
+alias ls='ls --color=auto'
+alias vi='vim'
+alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
+[sedu07@node8289 sedu07]$ editor
+
+```
+#### 등록
+alias editor='vim'
+
+#### 해체 
+unalias editor
+
+#### 사용
+editor
+* 원래 없던 명령어를 만들어서, 등록해서 사용가능함.
 
 
 
+### 자동완성기능 탭.
 
 
+### 디렉토리 관련
+
+* cd
+   * 이동
+* pwd
+   * 현재 워킹 디렉토리
+* mkdir
+   * 생성
+* rmdir
+   * 삭제
+* touch
+   * `touch aaa.txt` 
+      * 없는 파일이면 생성
+      * 있는 파일이면 수정날짜 지금으로 변경
+* cp
+   * cp aaa.txt bbb.txt
+      * 복사할 것과 복사될 파일의 파일명
+
+### cd ../..
+한번에 몇단계로 넘어갈때
+* cd ..     # 한 단계
+* cd ../..  # 두 단계
+
+### 복사 방법
+드레그 하면 복사.
+
+### 붙여넣는 방법
+우클릭하면 붙여넣기
 
 
+```
+[sedu07@node8289 sedu07]$ mkdir white
+[sedu07@node8289 sedu07]$ mkdir red
+[sedu07@node8289 sedu07]$ cd red
+[sedu07@node8289 red]$ ls
+[sedu07@node8289 red]$ mkdir black
+[sedu07@node8289 red]$ cd black
+[sedu07@node8289 black]$ touch my.txt
+[sedu07@node8289 black]$ pwd
+/scratch/sedu07/red/black
+[sedu07@node8289 black]$ ls -l
+total 0
+-rw-r--r-- 1 sedu07 in0163 0 Feb 20 11:28 my.txt
+[sedu07@node8289 black]$ !to
+touch my.txt
+[sedu07@node8289 black]$ ls -l
+total 0
+-rw-r--r-- 1 sedu07 in0163 0 Feb 20 11:29 my.txt
+[sedu07@node8289 black]$ ls
+my.txt
+[sedu07@node8289 black]$ pwd
+/scratch/sedu07/red/black
+[sedu07@node8289 black]$ cd..
+-bash: cd..: command not found
+[sedu07@node8289 black]$ cd ..
+[sedu07@node8289 red]$ cd ..
+[sedu07@node8289 sedu07]$ pwd
+/scratch/sedu07
+[sedu07@node8289 sedu07]$ ls
+blue  green  red  white
+[sedu07@node8289 sedu07]$ mkdir -p cyan/aaa/bbb
+[sedu07@node8289 sedu07]$ pwe
+-bash: pwe: command not found
+[sedu07@node8289 sedu07]$ pwd
+/scratch/sedu07
+[sedu07@node8289 sedu07]$ ls
+blue  cyan  green  red  white
+[sedu07@node8289 sedu07]$ cd cyan
+[sedu07@node8289 cyan]$ ;s
+-bash: syntax error near unexpected token `;'
+[sedu07@node8289 cyan]$ ls
+aaa
+[sedu07@node8289 cyan]$ pwd
+/scratch/sedu07/cyan
+[sedu07@node8289 cyan]$ cd aaa
+[sedu07@node8289 aaa]$ cd bbb
+[sedu07@node8289 bbb]$ cd ..
+[sedu07@node8289 aaa]$ cd ..
+[sedu07@node8289 cyan]$ dir
+aaa
+[sedu07@node8289 cyan]$ pwd
+/scratch/sedu07/cyan
+[sedu07@node8289 cyan]$ cd ..
+[sedu07@node8289 sedu07]$
+
+```
 
 
+### mkdir -p cyan/aaa/bbb
+
+하위 디렉토리까지 이어서 한번에 만들기
+
+### cp 복사
+
+* cp my.txt ../../(tap)
+복사를 해서 원하는 폴더에 만드려고 할 때 윗단계, 윗단계, 그리고 탭을 누르면 저 위에 무슨 폴더가 있는지 확인 가능. 그리고 복사 실행.
 
 
+### rm
+
+* rmdir green 
+빈 폴더만 삭제 가능
+
+* rm *.txt 
+와일드카드 사용가능.
+
+* rm -r red
+-r 리컬시브. 재귀적으로 지우겠다. 
+-f 강제로 지우겠다
+-i 지울때마다 물어보겠다.
+-rf
 
 
+* rm -ri blue
+하나씩 물어가면서 지우는.
 
 
+### mv 이동 또는 파일명 변경
 
 
+```
+[sedu07@node8289 sedu07]$ mkdir red
+[sedu07@node8289 sedu07]$ cd red
+[sedu07@node8289 red]$ touch 1.txt
+[sedu07@node8289 red]$ mv 1.txt ../
+[sedu07@node8289 red]$ ls
+[sedu07@node8289 red]$ cd ..
+[sedu07@node8289 sedu07]$ ls
+1.txt  blue  red
+[sedu07@node8289 sedu07]$
+
+```
+
+복사는 그대로 복사지만 이동은 복사해놓고 기존파일 삭제이다. 그래서
+
+* mv 1.txt 2.txt 하면 1파일이 2파일로 파일명이 바뀐다.
 
 
+* mv -b 1.txt ../2.txt
+이동하면서 백업파일 생성
 
+### editor 나오기
+콜론 누르고 q 인서트도 있음
+### cat 실행.
+간단한 파일일때 사용가능
+### echo 화면 출력
 
-
-
+```
+[sedu07@node8289 sedu07]$ echo $HOME
+/home01/sedu07
+```
 
 
 
