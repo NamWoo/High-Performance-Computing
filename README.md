@@ -9,6 +9,11 @@
 관리자 시스템과 사용자 시스템이 있다. 누리온 시스템 관련 사용관련해서 있다. 다음달엔 리눅스 관리자 교육이다. 루트 관련 교육이다. 
 
 ## 접속
+
+* Putty 
+* Host name : nurion.ksc.re.kr (port : 22)
+
+
 ```
 login as: sedu07
 Using keyboard-interactive authentication.
@@ -87,7 +92,77 @@ Filesystem       KBytes        Quota      Files      Quota
 
 [sedu07@login01 ~]$ 
 ```
-## 
+
+## scratch
+
+scratch 로 이동해야지만 job을 제출할 수 있다.
+```
+[sedu07@login01 ~]$ pwd
+/home01/sedu07
+[sedu07@login01 ~]$ cd /scratch/sedu07/
+[sedu07@login01 sedu07]$ pwd
+/scratch/sedu07
+```
+
+## job 제출
+```
+[sedu07@login01 sedu07]$ qsub -I -V -l select=1 -l walltime=04:00:00 -q debug
+qsub: waiting for job 1914665.pbs to start
+qsub: job 1914665.pbs ready
+
+[sedu07@node8291 ~]$
+
+```
+로그인 노드는 노드가 4개 밖에 없다. 계산 돌릴 수 없다. 잡 제출해야한다.
+KNL은 계산노드. 직접 접속할 수는 없다.
+
+-I 인터렉트티브하게
+-V 로인 정보 가져오겟다
+
+select 청크
+q는 디버그 가져오겠다
+
+qsub -I -V -l select=1 -l walltime=04:00:00 -q debug
+4시간동인 인터렉티브하게 작업하겠다.
+
+`[sedu07@node8291 ~]$` 뒤에 숫자가 붙어서 8291 , 이건 계산노드라는 말.
+
+
+## PBS_O_WORKDIR 작업공간으로 이동
+$PBS_O_WORKDIR
+```
+[sedu07@node8291 ~]$ cd $PBS_O_WORKDIR
+[sedu07@node8291 sedu07]$ 
+```
+## exit
+열심히 작업하고 더이상 안 할꺼면 exit 해야함. 계속 cpu를 먹고 있다는 말이고 과금되고 있다는 말. exit 하면 노드가 바뀐다. 뒤 숫자 바뀜
+```
+[sedu07@node8291 sedu07]$ exit
+logout
+
+qsub: job 1914665.pbs completed
+[sedu07@login01 sedu07]$
+```
+
+## 반복
+```
+[sedu07@login01 sedu07]$ qsub -I -V -l select=1 -l walltime=04:00:00 -q debug
+qsub: waiting for job 1914731.pbs to start
+qsub: job 1914731.pbs ready
+
+[sedu07@node8289 ~]$ cd $PBS_O_WORKDIR
+[sedu07@node8289 sedu07]$
+```
+다시 로그인해서 기억하고 있는 WORKDIR로 이동.
+
+
+
+
+
+
+
+
+
 
 
 
@@ -95,8 +170,4 @@ Filesystem       KBytes        Quota      Files      Quota
 
 
 ## HPC 교육 2일차, 2019년 2월 21일 목요일
-
-
-
-### 
 ## HPC 교육 3일차, 2019년 2월 22일 금요일
