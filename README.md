@@ -9,7 +9,7 @@
 관리자 시스템과 사용자 시스템이 있다. 누리온 시스템 관련 사용관련해서 있다. 다음달엔 리눅스 관리자 교육이다. 루트 관련 교육이다. 
 
 ## 접속
-
+```
 login as: sedu07
 Using keyboard-interactive authentication.
 Password(OTP):
@@ -86,7 +86,7 @@ Filesystem       KBytes        Quota      Files      Quota
 *If the quota is exceeded,creation or writing is not possible!!
 
 [sedu07@login01 ~]$ 
-
+```
 ## 
 
 
