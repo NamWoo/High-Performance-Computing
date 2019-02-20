@@ -894,7 +894,45 @@ Original file
 * bg는 background
 * fg는 foreground
 
+
 jobs
+
+## Vi Editor (vim vi)
+
+* vi test.c
+* i, I, a, A, o, O, R
+* ESC
+
+
+###
+: 2,4 d
+
+2번째부터 4번째줄까지 지워라.
+
+### 명령취소
+
+
+### 줄 번호 
+
+:set nu
+
+### 검색 /
+
+### 치환
+* :%s/old/new/g
+% 있으면 전체 문서에서, 없으면 한 줄에서.
+
+###  문자열 탐색 대소문자 구분 안 할때
+
+* \c
+   * :/\cabc
+   
+### 윈도우에서 작성된 파일을 vi로 열면 생기는 문제
+
+^M
+
+:%s/\^M//g
+
 
 
 
