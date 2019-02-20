@@ -934,13 +934,80 @@ jobs
 :%s/\^M//g
 
 
+## 쉘
+```
+[sedu07@node8282 test2]$ echo $SHELL
+/bin/bash
+[sedu07@node8282 test2]$ cat /etc/shells
+/bin/sh
+/bin/bash
+/sbin/nologin
+/usr/bin/sh
+/usr/bin/bash
+/usr/sbin/nologin
+/usr/bin/tmux
+/bin/ksh
+/bin/rksh
+/bin/tcsh
+/bin/csh
+```
+`$ echo $SHELL`
+환경변수에서 지금 사용중인 쉘 확인
+
+`$ cat /etc/shells`
+
+사용가능 쉘 확인
+
+### 쉘 스크립트 만들어서 모듈 추가 항상 해놓기.
+vi ~/.bashrc 에서 
+
+module add intel/18.0.3
+
+
+!/bin/bash # 아래 오는 명령어들을 bash셀 명령으로 인식해라.
+
+보통 스크립트할 때 이런 지정해주고 시장한다.
+
+echo 'hello'
+exit 0
+
+sh ./test.sh
+
+chmod +x test.sh.  색이 바뀔 것이다. 실행권한있는
+
+chmod -r test.sh
+
+```
+!/bin/bash
+ a="world"
+  
+ echo "Hello"
+ echo $a
+```
+
+a='world' 여기서 띄어쓰기 하면 안됨. a = 'world' 이렇게 하면 실행 불가.
+
+$? 이전 명령이 성공 했느냐? 성공했으면 0, 아니면 다른 숫자깞 에러코드가 나올것이ㅏㄷ.
+
+" ' 차이가 크다.
+" 이게 실제 "Hello"
+' 이건 그냥 안의 내용 그냥 불러오기
 
 
 
+``` '`'`'`'`'`'`'`'`''``'```'``'`'`'`'`'``'`''''````'''''''''''''''
+$0
+$1
+$2
+$@
+$*"
+$#"
+```
 
 
+## MAKE 컴파일
 
-
+### 
 
 ## HPC 교육 2일차, 2019년 2월 21일 목요일
 ## HPC 교육 3일차, 2019년 2월 22일 금요일
