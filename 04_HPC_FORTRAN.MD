@@ -597,3 +597,17 @@ END PROGRAM pi_cal
 [sedu20@node8281 Fortran]$
 
 ```
+1:ncpus=68:
+
+
+
+```
+program 
+
+real(kind=8)::a
+
+real
+
+
+
+```
