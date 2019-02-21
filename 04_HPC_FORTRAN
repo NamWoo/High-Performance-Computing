@@ -405,3 +405,119 @@ WRITE(*,'(A,F15.10,2X,A,E15.10)')'pi=',pi,&
 END PROGRAM mc_pi
 
 ```
+
+
+
+
+```
+
+[sedu20@node8286 Fortran]$ cat recursive.f90
+PROGRAM recursive_ex
+IMPLICIT NONE
+INTEGER::n, res
+PRINT*,'ENTER THE POSITIVE INTEGER '
+READ*,n
+res=factorial(n)
+PRINT*,'RES( in function)=',res
+
+CALL fact_routine(n,res)
+PRINT*,'RES( in subroutine)=',res
+CONTAINS
+RECURSIVE INTEGER FUNCTION factorial(n) RESULT(fact)
+IMPLICIT NONE
+INTEGER,INTENT(IN)::n
+IF(n==0) THEN
+    fact=1
+ELSE
+    fact=n*factorial(n-1)
+END IF
+END FUNCTION factorial
+
+RECURSIVE SUBROUTINE fact_routine(n,fact)
+IMPLICIT NONE
+INTEGER,INTENT(IN)::n
+INTEGER,INTENT(OUT)::fact
+IF(n==0) THEN
+    fact=1
+ELSE
+    CALL fact_routine(n-1,fact)
+    fact=n*fact
+END IF
+END SUBROUTINE fact_routine
+END PROGRAM recursive_ex
+
+```
+
+```
+[sedu20@node8286 Fortran]$ cat  Reshape.f90
+PROGRAM reshape_ex
+IMPLICIT NONE
+INTEGER,DIMENSION(2,2)::a
+INTEGER,DIMENSION(2,3)::b
+
+a=RESHAPE((/1,2,3,4/),(/2,2/))
+PRINT*,a(1,:)
+PRINT*,a(2,:)
+PRINT*,''
+a=RESHAPE((/1,2,3,4/),(/2,2/),ORDER=(/1,2/))
+PRINT*,a(1,:)
+PRINT*,a(2,:)
+PRINT*,''
+a=RESHAPE((/1,2,3,4/),(/2,2/),ORDER=(/2,1/))
+PRINT*,a(1,:)
+PRINT*,a(2,:)
+PRINT*,''
+b=RESHAPE((/1,2,3,4/),(/2,3/),(/0/),(/2,1/))
+PRINT*,b(1,:)
+PRINT*,b(2,:)
+
+END PROGRAM reshape_ex
+
+```
+
+
+```
+[sedu20@node8286 Fortran]$ cat Normalize.f90
+PROGRAM normalize
+IMPLICIT NONE
+REAL,DIMENSION(5)::g
+INTEGER, DIMENSION(1)::maxij
+INTEGER::i,j
+g=(/5.0, 5.0,10.0, 5.0, 5.0/)
+maxij=MAXLOC(g)
+DO i=1,5
+    g(i)=g(i)/g(maxij(1))
+END DO
+PRINT*,g
+PRINT*,'------------------'
+g=(/5.0, 5.0,10.0, 5.0, 5.0/)
+g=g/g(maxij(1))
+PRINT*,g
+END PROGRAM normalize
+
+```
+
+
+
+```
+[sedu20@node8286 Fortran]$ cat DerivedPointerArray.f90
+PROGRAM derived_pointer_array
+IMPLICIT NONE
+TYPE varray
+    INTEGER, DIMENSION(:), POINTER::vdat
+    INTEGER,DIMENSION(:),ALLOCATABLE::a
+END TYPE varray
+TYPE(varray)::p1
+INTEGER::i
+ALLOCATE(p1%a(5))
+p1%a=(/(i,i=1,5)/)
+PRINT*,p1%a
+DEALLOCATE(p1%a)
+
+ALLOCATE(p1%a(10))
+p1%a=(/(i,i=1,10)/)
+PRINT*,p1%a
+DEALLOCATE(p1%a)
+END PROGRAM derived_pointer_array
+
+```
