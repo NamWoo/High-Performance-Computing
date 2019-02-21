@@ -212,9 +212,196 @@ DM: Division and Multiplication
 AS: 
 
 
+### 자료 복사해오기
+```
+[sedu20@node8286 test0221]$ scp 150.183.150.14:/tmp/Fortran.tgz .
+Password(OTP):
+Password:
+```
+### 자료 압축 풀기
+
+```
+[sedu20@node8286 test0221]$ tar -xzvf Fortran.tgz
+Fortran/
+Fortran/DerivedType.f90
+Fortran/positioning.f90
+Fortran/Parameter.f90
+Fortran/output001.txt
+Fortran/Allocate.f90
+Fortran/WithoutIndex.f90
+Fortran/InternalFile.f90
+Fortran/output.txt
+Fortran/ImplicitIniterface.f90
+Fortran/point_sum.f90
+Fortran/value.f90
+Fortran/norm.f90
+Fortran/procedure_pointer.f90
+Fortran/mean2.f90
+Fortran/output005.txt
+Fortran/namelist.f90
+Fortran/keyword.f90
+Fortran/overloading.f90
+Fortran/Merge.f90
+Fortran/slash.f90
+Fortran/ArrayConstructor.f90
+Fortran/module2.f90
+Fortran/output009.txt
+Fortran/m1.f90
+Fortran/Normalize.f90
+Fortran/private.f90
+Fortran/Pi.f90
+Fortran/en_ex.f90
+Fortran/output006.txt
+Fortran/PointerValuedFunction.f90
+Fortran/pointer2.f90
+Fortran/DerivedPointerArray.f90
+Fortran/format_ex.f90
+Fortran/kind_parameter.f90
+Fortran/output004.txt
+Fortran/integer_ex.f90
+Fortran/functionoverloading.f90
+Fortran/real_es.f90
+Fortran/input.txt
+Fortran/const.f90
+Fortran/env_ex.f90
+Fortran/DerivedPointerArray2.f90
+Fortran/ExplicitShape.f90
+Fortran/test.f90
+Fortran/inc/
+Fortran/inc/m1.mod
+Fortran/inc/m2.mod
+Fortran/intent.f90
+Fortran/DynamicAllocation.f90
+Fortran/output007.txt
+Fortran/Save.f90
+Fortran/allocatable_dummy_argument.f90
+Fortran/module3.f90
+Fortran/allocatable_return_fn.f90
+Fortran/DotProduct.f90
+Fortran/score.dat
+Fortran/output008.txt
+Fortran/Internal.f90
+Fortran/character_ex.f90
+Fortran/output002.txt
+Fortran/LinkedList.f90
+Fortran/Goto.f90
+Fortran/Forall.f90
+Fortran/Module.f90
+Fortran/MC_PI.f90
+Fortran/danglingpointer.f90
+Fortran/stream_ex.dat
+Fortran/pure.f90
+Fortran/int_kind.f90
+Fortran/elementalIntrinsic.f90
+Fortran/userdefinedoperator.f90
+Fortran/output003.txt
+Fortran/m2.f90
+Fortran/HelloWorld.f90
+Fortran/arguments.f90
+Fortran/If.f90
+Fortran/Arrayinitializer.f90
+Fortran/stream.f90
+Fortran/Interoperation_with_C.f90
+Fortran/core.52873
+Fortran/Array.f90
+Fortran/pointer3.f90
+Fortran/core.6770
+Fortran/recursive.f90
+Fortran/mean1.f90
+Fortran/AssumedShape.f90
+Fortran/statement.f90
+Fortran/ExplicitInterface.f90
+Fortran/operatoroverloading.f90
+Fortran/assignoverloading.f90
+Fortran/real_e.f90
+Fortran/SelectCase.f90
+Fortran/output010.txt
+Fortran/core.52858
+Fortran/Reshape.f90
+Fortran/real_ex.f90
+Fortran/C_func.c
+Fortran/pointer.f90
+Fortran/optional.f90
+Fortran/elementalfunction.f90
+Fortran/module.f90
+Fortran/Do.f90
+
+```
+
+### 하나씩 해보기
+
+```fortran
+PROGRAM DerivedType
+IMPLICIT NONE
+TYPE coord_3d
+    REAL::x,y,z
+END TYPE coord_3d
+TYPE(coord_3d)::pt1, pt2=coord_3d(2.0, 2.0, 2.0), pt3
+pt1%x=1.0;     pt1%y=1.0;    pt1%z=1.0
+pt3=coord_3d(3.0, 3.0, 3.0)
+PRINT*,pt1%x, pt1%y, pt1%z;   PRINT*,pt2%x, pt2%y, pt2%z
+PRINT*,pt3%x, pt3%y, pt3%z
+END PROGRAM DerivedType
+
+```
 
 
+```
+
+[sedu20@node8286 Fortran]$ cat DotProduct.f90
+PROGRAM array_func_dot
+
+IMPLICIT NONE
+INTEGER, PARAMETER :: NumItems = 5
+REAL, DIMENSION(NumItems) :: A, B
+
+A = (/1,2,3,4,5/)
+B = (/1,2,3,4,5/)
+
+PRINT '(1X, "Dot Product define function : ", F6.2)',  dot(a,b,NumItems)
+PRINT '(1X, "Dot Product array function : ", F6.2)',  DOT_PRODUCT(A,B)
+
+CONTAINS
+        REAL FUNCTION dot(a,b,n)
+                INTEGER i
+                INTEGER, INTENT(IN) :: n
+                REAL, DIMENSION(N), INTENT(IN) :: a, b
+
+                dot=0.0
+                DO i = 1, n
+                        dot = dot + a(i) * b(i)
+                END DO
+        END FUNCTION dot
+END PROGRAM array_func_dot
 
 
+```
 
+```
+[sedu20@node8286 Fortran]$ cat MC_PI.f90
+PROGRAM mc_pi
+IMPLICIT NONE
+INTEGER(KIND=8)::i,scope=100000000
+REAL(kind=8)::x,y,z, pi, z1, in_count=0.0, out_count=0.0
+INTEGER::seed=1234
 
+CALL srand(seed)
+DO i=0,scope-1
+    x=rand();   y=rand()
+    z=x*x+y*y
+!    z1=SQRT(z)
+
+!    IF(z1<=1)THEN
+    IF(Z<=1)THEN
+        in_count=in_count+1
+    ELSE
+        out_count=out_count+1
+    END IF
+END DO
+pi=(4*in_count)/(in_count+out_count)
+WRITE(*,'(A,F15.10,2X,A,E15.10)')'pi=',pi,&
+'Error=',DABS(pi-ACOS(-1.0d0))
+
+END PROGRAM mc_pi
+
+```
