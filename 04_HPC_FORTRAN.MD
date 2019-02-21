@@ -527,3 +527,25 @@ END PROGRAM derived_pointer_array
 filezilla
 sftp
 포트22
+
+
+```
+[sedu20@node8281 Fortran]$ vi Do.f90
+[sedu20@node8281 Fortran]$ gfortran Do.f90
+[sedu20@node8281 Fortran]$ ./a.out
+ SUM=          55
+[sedu20@node8281 Fortran]$
+
+```
+
+This is some shared instructions.
+
+```if:javascript,ruby
+This is only shown to JavaScript and Ruby users
+- markdown is supported inside of here
+- you can even include code blocks by using the alternate ~~~ format instead of ```
+```
+```if:csharp
+this is only shown to C# users
+```
+
