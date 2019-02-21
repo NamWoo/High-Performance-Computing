@@ -646,3 +646,39 @@ python2.7          python3            python3.7m         python-config
 ```
 
 
+```python
+import time
+
+from timeit import default_timer as timer
+
+step = 1/500000
+sum = 0
+start = timer()
+for i in range(500000):
+        x = (i-0.5)*step
+        sum = sum + 4/(1+x*x)
+pi = step*sum
+end = timer()
+
+print(pi, end-start)
+
+```
+
+qsub -I -V -l select=1 -l walltime=00:00:10 -q debug 
+
+qsub -I -V -l select=1:68 walltime=00:00:10 -q debug
+
+
+
+
+pgi community edition  상용이라 쿠다포트란. 
+
+qsub 
+
+[sedu20@login02 scratch]$ qsub -I -V -l select=1:ncpus=68:ompthreads=68  -l walltime=04:00:00 -q debug
+fqsub: waiting for job 1922833.pbs to start                                                         qsub: job 1922833.pbs ready
+
+
+select=1:ncpus=68:ompthreads=68  -l walltime=04:00:00 -q debug
+fqsub:
+
