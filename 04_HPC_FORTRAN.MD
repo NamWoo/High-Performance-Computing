@@ -611,3 +611,38 @@ real
 
 
 ```
+
+```
+
+[sedu20@node8283 test]$ cat pi.py
+import time
+from timeit import default_timer as timer
+
+step = 1/500000
+sum = 0
+start = timer()
+for i in range(500000):
+        x = (i-0.5)*step
+        sum = sum + 4/(1+x*x)
+pi = step*sum
+end = timer()
+
+print(pi, end-start)
+
+```
+
+
+```
+Fortran  Fortran.tgz  pi.py
+[sedu20@node8283 test]$ vi pi.py
+[sedu20@node8283 test]$ python
+python             python2.7-config   python3.7          python3.7m-config
+python2            python2-config     python3.7-config   python3-config
+python2.7          python3            python3.7m         python-config
+[sedu20@node8283 test]$ python pi.py
+3.1415966535861077 0.7439580780919641
+
+
+```
+
+
