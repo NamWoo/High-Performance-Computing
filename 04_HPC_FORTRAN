@@ -196,6 +196,24 @@ qsub: job 1920919.pbs ready
 
 
 
+## 포트란
+
+* FORmula TRANslation
+IBM에서 1950 년대 개발. 가장 오래된 최초의 고급언어(C 보다도 빠르다)
+
+포트란 96로 객체지향 가능, 오늘은 90 95
+
+### 우선순위 보드마스
+
+BODMAS
+B: Brackets first
+O: Orders (power, square roots, etc.)
+DM: Division and Multiplication
+AS: 
+
+
+
+
 
 
 
