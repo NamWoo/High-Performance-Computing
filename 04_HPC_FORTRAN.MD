@@ -682,3 +682,56 @@ fqsub: waiting for job 1922833.pbs to start                                     
 select=1:ncpus=68:ompthreads=68  -l walltime=04:00:00 -q debug
 fqsub:
 
+
+
+# 2일차
+## 컴파일러
+
+컴파일 인텔꺼 쓰니까 인텔을 많이 추천한다. 인텔 나이츠렌딩에 인텔 컴파일러.
+
+## 작업제출
+
+```
+[sedu20@login01 sedu20]$ qsub -I -V -l select=1 -l walltime=03:00:00 -q debug
+qsub: waiting for job 1924900.pbs to start
+qsub: job 1924900.pbs ready
+```
+
+## argument 명령행 인자
+### 컴파일 방법
+* `[sedu20@node8285 Fortran]$ gfortran env_ex.f90 -o env_ex1`
+
+```
+[sedu20@node8285 Fortran]$ cat env_ex.f90
+PROGRAM env_ex
+IMPLICIT NONE
+CHARACTER(LEN=255)::pwd, home
+CALL GET_ENVIRONMENT_VARIABLE("PWD",pwd)
+CALL GET_ENVIRONMENT_VARIABLE("HOME",home)
+IF(pwd /= home)THEN
+   PRINT*,'Current directory is '//TRIM(pwd)
+   PRINT*,'Your home directory is '//TRIM(home)
+   PRINT*,'Program must be run in home directory.!!!'
+   RETURN
+else
+   PRINT*,'Good!!!!'
+ENDIF
+END PROGRAM env_ex
+
+[sedu20@node8285 Fortran]$ gfortran env_ex.f90 -o env_ex1
+
+```
+
+##
+
+*  https://m.blog.naver.com/skansllove/220160904491
+윈도우에서 fortran 쓰기
+
+* https://github.com/arjo129
+포트란 deep learning
+
+```
+
+
+
+```
