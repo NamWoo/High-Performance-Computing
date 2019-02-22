@@ -1,0 +1,10 @@
+PROGRAM dangling
+IMPLICIT NONE
+REAL, POINTER::p1,p2
+ALLOCATE(p1)
+p1=3.4;    p2=>p1
+PRINT*,'p1=',p1, 'p2=',p2
+DEALLOCATE(p1)
+PRINT*,'p2=',p2
+END PROGRAM dangling
+

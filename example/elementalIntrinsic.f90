@@ -1,0 +1,12 @@
+PROGRAM int_elemental
+IMPLICIT NONE
+REAL,PARAMETER::PI=ACOS(-1.0)
+REAL,DIMENSION(10)::x
+INTEGER::i
+DO i=10,1,-1
+    x(i)=PI/DBLE(i)
+END DO
+PRINT*,COS(PI)
+PRINT*,COS(x)
+END PROGRAM int_elemental
+

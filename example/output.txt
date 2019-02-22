@@ -1,0 +1,5 @@
+&INPUTS
+ I=         10,
+ A=  20.0000000    ,
+ LAN="Fortran   ",
+ /

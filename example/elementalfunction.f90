@@ -1,0 +1,26 @@
+PROGRAM elementalfunction
+IMPLICIT NONE
+INTEGER,DIMENSION(10)::x, y
+INTEGER::a=100, b
+x=(/1,2,3,4,5,6,7,8,9,10/)
+y=func(x)
+PRINT*,y;    PRINT*,func(a)
+CALL routine(x,y)
+PRINT*,y
+CALL routine(a,b)
+PRINT*,b
+CONTAINS
+ELEMENTAL INTEGER FUNCTION func(x)
+IMPLICIT NONE
+INTEGER,INTENT(IN)::x
+func=x+1
+END FUNCTION func
+
+ELEMENTAL SUBROUTINE routine(x,y)
+IMPLICIT NONE
+INTEGER,INTENT(IN)::x
+INTEGER,INTENT(OUT)::y
+y=x+1
+END SUBROUTINE routine
+END PROGRAM elementalfunction
+
