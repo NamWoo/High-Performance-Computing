@@ -730,8 +730,28 @@ END PROGRAM env_ex
 * https://github.com/arjo129
 포트란 deep learning
 
+
+## 파이썬 속도 테스트 
+
+* https://niceman.tistory.com/145
+
+딱 반 차이
+```
+
+# 프로세서가 1개
+--- 12.838696479797363 seconds ---
+[sedu20@node8281 test]$
+
+# 프로세서가 2개
+--- 6.941561222076416 seconds ---
+[sedu20@node8281 test]$
+
+# 프로세서가 68개
+--- 4.678817510604858 seconds ---
+[sedu20@node8281 test]$
+
 ```
 
 
-
-```
+* https://github.com/arjo129
+* https://docs.python.org/ko/3/library/multiprocessing.html
