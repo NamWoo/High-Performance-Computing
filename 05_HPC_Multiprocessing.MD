@@ -770,3 +770,50 @@ END PROGRAM MATMUL_LIB
 
 
 
+```
+[sedu10@node8286 ParallelProgramming]$ module add intel/18.0.3
+[sedu10@node8286 ParallelProgramming]$ ls
+a.dat          Lapack_ex.x     PiMPI_c.x  PiPar_for.x    PiSeq.f90
+b.dat          MakeInput.f90   PiMPI.f90  PiPar_intel.x  PiSeq.o
+Lapack_ex.c    MatMul_Lib.f90  PiPar.c    PiSeq          scalapack_ex.f90
+Lapack_ex.f90  PiMPI.c         PiPar.f90  PiSeq.c
+[sedu10@node8286 ParallelProgramming]$ ifort -qopenmp PiPar.f90
+PiPar.f90(31): remark #8291: Recommended relationship between field width 'W' and the number of fractional digits 'D' in this edit descriptor is 'W>=D+7'.
+100  format(' PI = ', F17.15,' (Error =',E11.5,')')
+------------------------------------------^
+[sedu10@node8286 ParallelProgramming]$ ls -lrth
+total 1.7M
+-rw-r--r-- 1 sedu10 in0163  596 Feb 26 16:05 PiSeq.c
+-rw-r--r-- 1 sedu10 in0163  664 Feb 26 16:11 PiSeq.f90
+-rw-r--r-- 1 sedu10 in0163  973 Feb 26 16:17 PiPar.f90
+-rw-r--r-- 1 sedu10 in0163  703 Feb 26 16:19 PiPar.c
+-rw-r--r-- 1 sedu10 in0163  942 Feb 26 18:38 PiMPI.c
+-rw-r--r-- 1 sedu10 in0163  955 Feb 26 18:51 PiMPI.f90
+-rw-r--r-- 1 sedu10 in0163  313 Feb 26 19:27 Lapack_ex.f90
+-rw-r--r-- 1 sedu10 in0163  838 Feb 26 19:50 Lapack_ex.c
+-rw-r--r-- 1 sedu10 in0163  245 Mar  5 04:22 MakeInput.f90
+-rw-r--r-- 1 sedu10 in0163  273 Mar  5 04:23 b.dat
+-rw-r--r-- 1 sedu10 in0163 4.3K Mar  5 04:23 a.dat
+-rw-r--r-- 1 sedu10 in0163 2.6K Mar  5 04:39 scalapack_ex.f90
+-rw-r--r-- 1 sedu10 in0163  730 Mar  5 04:49 MatMul_Lib.f90
+-rwxr-xr-x 1 sedu10 in0163  13K Mar  5 14:15 PiSeq
+-rwxr-xr-x 1 sedu10 in0163  13K Mar  5 14:30 PiSeq.o
+-rwxr-xr-x 1 sedu10 in0163  13K Mar  5 14:46 PiPar_for.x
+-rwxr-xr-x 1 sedu10 in0163 780K Mar  5 14:54 PiPar_intel.x
+-rwxr-xr-x 1 sedu10 in0163  13K Mar  5 15:53 PiMPI_c.x
+-rwxr-xr-x 1 sedu10 in0163  30K Mar  5 16:39 Lapack_ex.x
+-rwxr-xr-x 1 sedu10 in0163 772K Mar  5 17:09 a.out
+[sedu10@node8286 ParallelProgramming]$ ./a.out
+-------------------------------------------
+ My thread ID =  0, Total  1 threads are activated
+ PI = 3.141592653590012 (Error =0.21894E-12)
+ Elapsed Time =    5.693 [sec]
+-------------------------------------------
+[sedu10@node8286 ParallelProgramming]$
+
+
+
+```
+
+
+
