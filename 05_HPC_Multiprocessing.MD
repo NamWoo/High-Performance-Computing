@@ -511,3 +511,262 @@ user    0m37.676s
 sys     0m0.257s
 ```
 
+
+## 메모리 패싱
+독립된 메모리 공간 가진다. 데이터가 필요하면 불러오는, 하나의 프로세서가 값을 바꾸면 전달하고 받아서 메모리에 저장해야한다.
+
+통신을 위한 함수일 뿐. 
+
+openMP는 컴파일에서 알아서. MPI는 라이브러리라서, 누리온에서는 모듈만 로드.
+
+포트란은 전부 서브루틴, 루틴값이 없다. call MPI_INI
+
+## 커뮤니케이터
+
+랭크번호를 알아야 통신이 가능하다.
+
+
+```
+[sedu10@login01 sedu10]$ module li
+Currently Loaded Modulefiles:
+  1) craype-network-opa   2) gcc/7.2.0            3) craype-mic-knl
+[sedu10@login01 sedu10]$ module add openmpi/3.1.0
+[sedu10@login01 sedu10]$ module li
+Currently Loaded Modulefiles:
+  1) craype-network-opa   3) craype-mic-knl
+  2) gcc/7.2.0            4) openmpi/3.1.0
+[sedu10@login01 sedu10]$
+```
+
+아까 qsub은
+
+`qsub -I -V -l select=1:ncpus=8:ompthreads=8 -l walltime=01:00:00 -q debug`
+
+이번에 qsub은
+
+`qsub -I -V -l select=1:ncpus=8:mpiprocs=8:ompthreads=1 -l walltime=01:00:00 -q debug`
+
+```
+[sedu10@login01 sedu10]$ qsub -I -V -l select=1:ncpus=8:mpiprocs=8:ompthreads=1 -l walltime=01:00:00 -q debug
+qsub: waiting for job 1961241.pbs to start
+qsub: job 1961241.pbs ready
+```
+
+
+## fortran MPI 코드
+
+```fortran
+PROGRAM pi_cal
+IMPLICIT NONE
+INCLUDE 'mpif.h'
+INTEGER ierr, nprocs, myrank,tag,j
+INTEGER status(MPI_STATUS_SIZE)
+INTEGER seed, tpoints, in_circle
+DOUBLE PRECISION pi, x, y, r, recv, RAND
+
+tpoints = 10000000
+
+CALL MPI_INIT(ierr)
+CALL MPI_COMM_SIZE(MPI_COMM_WORLD,nprocs,ierr)
+CALL MPI_COMM_RANK(MPI_COMM_WORLD,myrank,ierr)
+in_circle = 0
+!seed=5
+!CALL SRAND(seed*myrank)
+
+DO j = myrank+1,tpoints,nprocs
+   call random_number(x)
+   call random_number(y)
+   x=x-0.5
+   y=y-0.5
+   r = SQRT(x*x + y*y)
+   IF (r<0.5d0) THEN
+      in_circle = in_circle + 1
+   ENDIF
+ENDDO
+pi = 4.0*in_circle/tpoints
+IF(myrank /= 0) THEN
+   CALL MPI_SEND(pi, 1, MPI_DOUBLE_PRECISION, 0, 1, &
+        MPI_COMM_WORLD, ierr)
+ENDIF
+
+IF(myrank==0) THEN
+   DO j = 1, nprocs-1
+      CALL MPI_RECV(recv, 1, MPI_DOUBLE_PRECISION, j, 1, &
+                    MPI_COMM_WORLD, status, ierr)
+      pi = pi + recv
+   ENDDO
+```
+
+```c
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "mpi.h"
+#include <math.h>
+void main(int argc, char *argv[]){
+  int j, nprocs, myrank,tag;
+  MPI_Status status;
+  int tpoints, in_circle;
+  double pi, seed, x, y, r, recv;
+
+  tpoints = 1000000;
+
+  MPI_Init(&argc, &argv);
+  MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+  in_circle = 0;  seed=0.5;
+  srand(seed*myrank);
+
+  for(j=myrank; j<tpoints; j+=nprocs){
+     x = (double)rand()/RAND_MAX - 0.5;
+     y = (double)rand()/RAND_MAX - 0.5;
+     r = sqrt(x*x + y*y);
+     if (r<=0.5) in_circle = in_circle + 1;
+  }
+  pi = 4.0*in_circle/tpoints;
+
+  if(myrank != 0)
+     MPI_Send(&pi,1,MPI_DOUBLE,0,1,MPI_COMM_WORLD);
+
+  if(myrank==0){
+     for(j=1; j<=nprocs-1; j++){
+         MPI_Recv(&recv, 1, MPI_DOUBLE, j, 1,
+                    MPI_COMM_WORLD, &status);
+         pi = pi + recv;
+     }
+     printf(" pi = %f\n", pi);
+  }
+  MPI_Finalize();
+}
+```
+
+
+c 실행
+
+```
+[sedu10@node8282 ParallelProgramming]$ mpicc PiMPI.c -o PiMPI_c.x -lm
+[sedu10@node8282 ParallelProgramming]$ time mpirun -np 8 ./PiMPI_c.x
+ pi = 3.140808
+
+real    0m1.204s
+user    0m1.361s
+sys     0m1.781s
+```
+
+실제는 이렇게 사용
+
+`qsub -I -V -l select=100:ncpus=68:mpiprocs=68:ompthreads=1 -l walltime=01:00:00 -q debug`
+
+한 청크에 10개
+
+
+## 라이브러리
+
+네트워크 가지고 연결, 제일 처음 컴파일러 mpi 설치하고 라팩, 블라스터, 다 설치한다. 거의 대부분 다 쓰기 때문에. 
+
+벡터-벡터
+벡터-행렬, 2중루프
+행렬-행렬, 3중루프
+
+http://netlib.org/
+
+http://netlib.org/blas/
+
+### LAPACK 
+
+라팩은 덴스 메트릭스 행렬 요수의 값이 대부분 0이 아닌, 의미있는 값.
+
+스파스 메트릭스, 대부분 0, 의미 있는 요소가 없는. cfd 같은.
+
+EISPACK 고유벡터, 고유치 구하는거 죄다 모아놓은.
+
+
+```fortran
+
+Program LinearEquations
+Implicit none
+Real*4 A(3,3), b(3)
+integer i, j, pivot(3), ok
+A(1,1)=3.1;   A(1,2)=1.3
+A(1,3)=-5.7;  A(2,1)=1.0
+A(2,2)=-6.9;  A(2,3)=5.8
+A(3,1)=3.4;   A(3,2)=7.2
+A(3,3)=-8.8
+
+b(1)=-1.3;  b(2)=-0.1;  b(3)=1.8
+
+call SGESV(3, 1, A, 3, pivot, b, 3, ok)
+do i=1, 3
+   write(*,*) b(i)
+end do
+end
+```
+
+실행
+
+```
+[sedu10@node8286 ~]$ module add lapack/3.7.0
+[sedu10@node8286 ~]$ pwd
+/home01/sedu10
+[sedu10@node8286 ~]$ module li
+Currently Loaded Modulefiles:
+  1) craype-network-opa   3) craype-mic-knl       5) lapack/3.7.0
+  2) gcc/7.2.0            4) openmpi/3.1.0
+[sedu10@node8286 ParallelProgramming]$ gfortran Lapack_ex.f90 -o Lapack_ex.x -L /apps/compiler/gcc/7.2.0/applib1/mic-knl/lapack/3.7.0 -llapack -lblas
+[sedu10@node8286 ParallelProgramming]$ time ./Lapack_ex.x
+   1.00000012
+   1.00000000
+   1.00000000
+
+real    0m0.016s
+user    0m0.002s
+sys     0m0.012s
+[sedu10@node8286 ParallelProgramming]$
+
+```
+
+
+보다 줄인거
+
+```fortran
+PROGRAM MATMUL_LIB
+IMPLICIT NONE
+!INTEGER,PARAMETER::N=2048*2
+INTEGER,PARAMETER::N=512
+INTEGER::I,J,K
+INTEGER(KIND=8)::ST,ET,C_RATE
+REAL(KIND=8)::DTIME
+REAL(KIND=8),DIMENSION(N,N)::A,B,C
+REAL(KIND=8)::C0,C1,C2,C3,TMP
+REAL(KIND=8)::ALPHA=1.0D0, BETA=0.0D0
+
+CALL RANDOM_NUMBER(A)
+CALL RANDOM_NUMBER(B)
+C=0.0
+
+CALL SYSTEM_CLOCK(ST,C_RATE)
+DO J=1,N
+  DO I=1,N
+    DO K=1,N
+      C(I,J)=C(I,J)+A(I,K)*B(K,J)
+    END DO
+  END DO
+END DO
+CALL SYSTEM_CLOCK(ET)
+DTIME=(ET-ST)/DBLE(C_RATE)
+PRINT*,C(1,1)
+PRINT*,'Original code(No Opt):',DTIME
+
+C=0.0D0
+CALL SYSTEM_CLOCK(ST,C_RATE)
+CALL DGEMM('N','N',N,N,N,ALPHA,A,N,B,N,BETA,C,N)
+CALL SYSTEM_CLOCK(ET)
+DTIME=(ET-ST)/DBLE(C_RATE)
+PRINT*,C(1,1)
+PRINT*,'MKL(Opt):',DTIME
+END PROGRAM MATMUL_LIB
+
+```
+
+
+
