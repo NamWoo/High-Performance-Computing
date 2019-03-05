@@ -243,3 +243,128 @@ time ./PI_sq.o
 ## 통신부하
 
 작은 것을 여러 번 보내는 것 보다 큰 것 한 번에 보내는 것이 빠르다
+
+
+
+
+## openMP 사용법
+
+병렬코드 지시어 넣고 openMP
+
+병렬코드 지시어 넣고 gpu에서 돌아가게 하는거 openACC
+
+https://www.openmp.org/
+
+
+openMP 는 지시어 삽입된 부분만, 그래서 점진적으로 가능, 디버깅 쉬워짐, 지시어 넣고 오케? 다음에 넣고 굳? 패쓰, 넣고 읭? 결과가 달라? 이렇게 가능.
+
+동기화, 의존성이 없다는 가정하에.
+
+
+## 병렬영역 지정과 작업분할
+
+
+```fortran
+INTEGER OMP_GET_THREAD_NUM
+CALL OMP_SET_NUM_THREADS(4)
+
+!$OMP PARALLEL DO
+!$OMP DO
+
+DO i = 1, n
+	a(i) = b(i) +c(i)
+ENDDO
+
+[!$OMP DO]
+!$OMP END PARALLEL DO
+```
+
+
+## pi 계산 실습
+
+
+```linux
+
+[sedu10@login01 ~]$ ls
+job_examples  ParallelProgramming.tgz
+[sedu10@login01 ~]$ tar -xzvf ParallelProgramming.tgz
+ParallelProgramming/
+ParallelProgramming/Lapack_ex.c
+ParallelProgramming/.a.dat.swp
+ParallelProgramming/Lapack_ex.f90
+ParallelProgramming/PiPar.f90
+ParallelProgramming/scalapack_ex.f90
+ParallelProgramming/PiMPI.c
+ParallelProgramming/PiSeq.f90
+ParallelProgramming/b.dat
+ParallelProgramming/PiSeq.c
+ParallelProgramming/PiPar.c
+ParallelProgramming/a.dat
+ParallelProgramming/PiMPI.f90
+ParallelProgramming/MakeInput.f90
+ParallelProgramming/MatMul_Lib.f90
+[sedu10@login01 ~]$ ls
+job_examples  ParallelProgramming  ParallelProgramming.tgz
+[sedu10@login01 ~]$ cd ParallelProgramming/
+[sedu10@login01 ParallelProgramming]$ ls
+a.dat        Lapack_ex.f90   PiMPI.c    PiPar.f90  scalapack_ex.f90
+b.dat        MakeInput.f90   PiMPI.f90  PiSeq.c
+Lapack_ex.c  MatMul_Lib.f90  PiPar.c    PiSeq.f90
+[sedu10@login01 ParallelProgramming]$ vi PiMPI.f90
+[sedu10@login01 ParallelProgramming]$ vi PiSeq.f90
+
+
+```
+
+
+
+```fortran
+program main
+implicit none
+integer*8,parameter :: num_step = 500000000
+integer*8           :: i
+real(kind=8)        :: sum,step,pi,x
+real(kind=4)        :: stime,etime
+step = (1.0d0/dble(num_step))
+sum  = 0.0d0
+write(*,400)
+call cpu_time(stime)  ! starting time
+
+do i=1,num_step
+  x   = (dble(i)-0.5d0)*step
+  sum = sum + 4.d0/(1.d0+x*x)  ! F(x)
+enddo
+call cpu_time(etime)  !ending time
+pi = step * sum
+write(*,100) pi,dabs(dacos(-1.0d0)-pi)
+write(*,300) etime-stime
+write(*,400)
+100  format(' PI = ', F17.15,' (Error =',E11.5,')')
+300  format(' Elapsed Time = ',F8.3,' [sec] ')
+400  format('-------------------------------------------')
+stop
+end program
+```
+
+```linux
+[sedu10@login01 ParallelProgramming]$ gfortran PiSeq.f90 -o ./PiSeq
+[sedu10@login01 ParallelProgramming]$ ls
+a.dat        Lapack_ex.f90   PiMPI.c    PiPar.f90  PiSeq.f90
+b.dat        MakeInput.f90   PiMPI.f90  PiSeq      scalapack_ex.f90
+Lapack_ex.c  MatMul_Lib.f90  PiPar.c    PiSeq.c
+[sedu10@login01 ParallelProgramming]$ ./PiSeq
+-------------------------------------------
+ PI = 3.141592653589814 (Error =0.20872E-13)
+ Elapsed Time =    6.543 [sec]
+-------------------------------------------
+
+```
+
+~
+
+~
+~
+~
+~
+~
+
