@@ -282,9 +282,11 @@ ENDDO
 
 ## pi 계산 실습
 
+### 준비
+압축풀고 옮기고
 
 ```linux
-
+[sedu10@login01 ~]$ scp 150.183.150.11:/tmp/ParallelProgramming.tgz .
 [sedu10@login01 ~]$ ls
 job_examples  ParallelProgramming.tgz
 [sedu10@login01 ~]$ tar -xzvf ParallelProgramming.tgz
@@ -312,11 +314,9 @@ b.dat        MakeInput.f90   PiMPI.f90  PiSeq.c
 Lapack_ex.c  MatMul_Lib.f90  PiPar.c    PiSeq.f90
 [sedu10@login01 ParallelProgramming]$ vi PiMPI.f90
 [sedu10@login01 ParallelProgramming]$ vi PiSeq.f90
-
-
 ```
 
-
+### fortran 순차코드
 
 ```fortran
 program main
@@ -346,6 +346,8 @@ stop
 end program
 ```
 
+실행
+
 ```linux
 [sedu10@login01 ParallelProgramming]$ gfortran PiSeq.f90 -o ./PiSeq
 [sedu10@login01 ParallelProgramming]$ ls
@@ -358,13 +360,154 @@ Lapack_ex.c  MatMul_Lib.f90  PiPar.c    PiSeq.c
  Elapsed Time =    6.543 [sec]
 -------------------------------------------
 
+[sedu10@login01 ParallelProgramming]$ time ./PiSeq
+-------------------------------------------
+ PI = 3.141592653589814 (Error =0.20872E-13)
+ Elapsed Time =    6.550 [sec]
+-------------------------------------------
+
+real    0m6.591s
+user    0m6.562s
+sys     0m0.013s
 ```
 
-~
 
-~
-~
-~
-~
-~
+### fortran 병렬코드
+
+
+```fortran
+program main
+use omp_lib
+implicit none
+integer*8,parameter :: num_step = 500000000
+integer*8           :: i
+real(kind=8)        :: sum,step,pi,x
+real(kind=4)        :: stime,etime
+integer             :: tid, num_threads
+step = (1.0d0/dble(num_step))
+sum  = 0.0d0
+write(*,400)
+call cpu_time(stime)  ! starting time
+
+!$OMP PARALLEL PRIVATE(tid,x)
+   tid=OMP_GET_THREAD_NUM()
+   num_threads=OMP_GET_NUM_THREADS()
+   write(*,10) tid, num_threads
+!$OMP DO REDUCTION(+:sum)
+do i=1,num_step
+  x   = (dble(i)-0.5d0)*step
+  sum = sum + 4.d0/(1.d0+x*x)  ! F(x)
+enddo
+!$OMP END DO
+!$OMP END PARALLEL
+call cpu_time(etime)  !ending time
+pi = step * sum
+write(*,100) pi,dabs(dacos(-1.0d0)-pi)
+write(*,300) etime-stime
+write(*,400)
+10   format(' My thread ID =',I3,', Total',I3,' threads are activated')
+100  format(' PI = ', F17.15,' (Error =',E11.5,')')
+300  format(' Elapsed Time = ',F8.3,' [sec] ')
+400  format('-------------------------------------------')
+stop
+end program
+```
+
+실행
+
+```
+[sedu10@login01 ParallelProgramming]$ cds
+[sedu10@login01 sedu10]$ qsub -I -V -l select=1:ncpus=8:ompthreads=8 -l walltime=01:00:00 -q debug
+qsub: waiting for job 1960784.pbs to start
+qsub: job 1960784.pbs ready
+
+[sedu10@node8284 ParallelProgramming]$ gfortran PiSeq.f90 -o PiSeq.o
+[sedu10@node8284 ParallelProgramming]$ time ./PiSeq.o
+-------------------------------------------
+ PI = 3.141592653589814 (Error =0.20872E-13)
+ Elapsed Time =   38.062 [sec]
+-------------------------------------------
+
+real    0m38.076s
+user    0m38.063s
+sys     0m0.010s
+[sedu10@node8284 ParallelProgramming]$ gfortran -fopenmp PiPar.f90 -o Pi
+PiMPI.c    PiPar.c    PiSeq      PiSeq.f90
+PiMPI.f90  PiPar.f90  PiSeq.c    PiSeq.o
+[sedu10@node8284 ParallelProgramming]$ gfortran -fopenmp PiPar.f90 -o PiPar_for.x
+[sedu10@node8284 ParallelProgramming]$ time ./PiPar_for.x
+-------------------------------------------
+ My thread ID =  5, Total  8 threads are activated
+ My thread ID =  6, Total  8 threads are activated
+ My thread ID =  1, Total  8 threads are activated
+ My thread ID =  4, Total  8 threads are activated
+ My thread ID =  7, Total  8 threads are activated
+ My thread ID =  3, Total  8 threads are activated
+ My thread ID =  0, Total  8 threads are activated
+ My thread ID =  2, Total  8 threads are activated
+ PI = 3.141592653589968 (Error =0.17497E-12)
+ Elapsed Time =   37.408 [sec]
+-------------------------------------------
+
+real    0m4.694s
+user    0m37.410s
+sys     0m0.019s
+[sedu10@node8284 ParallelProgramming]$ export OMP_NUM_THREADS=16
+[sedu10@node8284 ParallelProgramming]$ gfortran -fopenmp PiPar.f90 -o PiPar_for.x
+[sedu10@node8284 ParallelProgramming]$ time ./PiPar_for.x
+-------------------------------------------
+ My thread ID =  0, Total 16 threads are activated
+ ...
+ My thread ID =  1, Total 16 threads are activated
+ PI = 3.141592653589879 (Error =0.85709E-13)
+ Elapsed Time =   37.472 [sec]
+-------------------------------------------
+
+real    0m2.359s
+user    0m37.485s
+sys     0m0.012s
+[sedu10@node8284 ParallelProgramming]$
+
+[sedu10@node8284 ParallelProgramming]$ export OMP_NUM_THREADS=128
+[sedu10@node8284 ParallelProgramming]$ time ./PiPar_for.x
+-------------------------------------------
+ My thread ID =  1, Total128 threads are activated
+ ...
+ My thread ID =127, Total128 threads are activated
+ PI = 3.141592653589788 (Error =0.53291E-14)
+ Elapsed Time =   37.672 [sec]
+-------------------------------------------
+
+real    0m0.775s
+user    0m37.644s
+sys     0m0.098s
+
+[sedu10@node8284 ParallelProgramming]$ export OMP_NUM_THREADS=1024
+[sedu10@node8284 ParallelProgramming]$ time ./PiPar_for.x
+-------------------------------------------
+ My thread ID = 60, Total*** threads are activated
+ ...
+ My thread ID =273, Total*** threads are activated
+ PI = 3.141592653589792 (Error =0.13323E-14)
+ Elapsed Time =   37.930 [sec]
+-------------------------------------------
+
+real    0m0.852s
+user    0m37.670s
+sys     0m0.497s
+[sedu10@node8284 ParallelProgramming]$ export OMP_NUM_THREADS=512
+[sedu10@node8284 ParallelProgramming]$ time ./PiPar_for.x
+-------------------------------------------
+ My thread ID =  1, Total512 threads are activated
+ ...
+
+
+ PI = 3.141592653589793 (Error =0.00000E+00)
+ Elapsed Time =   37.790 [sec]
+-------------------------------------------
+
+real    0m0.770s
+user    0m37.676s
+sys     0m0.257s
+```
 
