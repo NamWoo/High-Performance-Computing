@@ -46,3 +46,26 @@ Vectorization
 * 누리온은 15.7패타플롭 기가G 위에 테라T 위에 페타P, 10^15
 
 
+
+
+
+## 큐 정책
+
+* showq
+* pbs_status
+* qstats -Q 목록조회
+* qstats -f 상세조회
+* pbs_queue_check 현재 계정으로 사용 가능한 큐 리스트 조회
+* pbs_queue_check -a 등록된 계산 노드 목록 조회
+* pbs_queue_check -aSj 노드 사용 내역 조회
+* qsub 작업제출 /scratch 에서만 가능
+* qdel 제출작업삭제
+* qstat 실행및대기중인 작업조회
+* qstat -u 지정 계정 작업목록출력
+* qstat -n 작업수행계산노드정보출력
+* qstat -x 끝난작업
+* qstat -xf 끝난작업 상세정보 
+* qstat -u 지정계정 종료작업목록 출력
+* qstat -xu sedu14 끝난작업 지정계정 sedu14 작업조회
+
+
