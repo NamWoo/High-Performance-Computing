@@ -14,7 +14,6 @@
 
 
 ### fortran으로 
-
 `[sedu14@login03 test01]$ cat hello.f90`
 ```fortran
 program hello_world
@@ -24,7 +23,7 @@ print *, 'hello World'
 end
 ```
 
-실행
+실행결과
 
 ```
 [sedu14@login03 test01]$ gfortran -fopenmp hello.f90 -o ./hello_f.x
@@ -54,6 +53,9 @@ end
  hello World
  hello World
 ```
+
+`print *, 'hello World'` 단 1번만 출력했지만 24번 출력됐다. 병렬 threads 기본설정이 24번이라 24번 threads가 모두 읽고 출력했기에 24번이 나오게 됐다.
+
 
 
 
@@ -1459,7 +1461,7 @@ sys     0m0.020s
 * 
 * 
 * 
-* 
+* https://docs.python.org/2/library/multiprocessing.html#examples
 * 
 * 
 * 
