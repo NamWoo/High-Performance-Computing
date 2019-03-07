@@ -1851,3 +1851,6 @@ F(10)=55
 
 33 34 35 
 
+
+https://github.com/jakezhaojb/Backpropagation-C/blob/master/bp.cpp
+
