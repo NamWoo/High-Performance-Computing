@@ -1474,3 +1474,380 @@ sys     0m0.020s
 * 
 * 
 
+
+
+
+```c
+#include <stdio.h>
+#include <omp.h>
+
+int main()
+{
+#pragma omp parallel num_threads(32)
+{
+	printf("A ");
+	printf("B ");
+	printf("C ");
+	printf("D ");
+	printf("\n");
+} // pragma omp parallel
+}
+```
+
+출력이 24번... 이건 우리가 원하는 것이 아니다. 하나씩 하나의 쓰레드가 출력! 
+
+
+
+```c
+#include <stdio.h>
+#include <omp.h>
+
+int main()
+{
+#pragma omp parallel num_threads(32)
+{
+	#pragma omp single
+	{
+		printf("A tid=%d\n", omp_get_thread_num() );
+		#pragma omp task
+		{
+			printf("B tid=%d\n", omp_get_thread_num() );
+		}
+		#pragma omp task
+		{
+			printf("C tid=%d\n", omp_get_thread_num() );
+		}
+		printf("D tid=%d\n", omp_get_thread_num() );
+	}
+}
+}
+
+```
+
+```
+
+[sedu14@login02 c]$ ./23_task3.x
+A tid=0
+B tid=12
+C tid=14
+D tid=0
+[sedu14@login02 c]$ ./23_task3.x
+A tid=0
+B tid=12
+C tid=1
+D tid=0
+[sedu14@login02 c]$ ./23_task3.x
+A tid=0
+B tid=12
+D tid=0
+C tid=18
+
+```
+
+A D 는 같은 쓰레드가 처리
+
+
+
+아까랑 작업은 똑같았는데 A와 D의 순서가 맞춰졌다.  D가 wait이 걸려있어서 task pool이 비어있을떄까지 대기니까.
+
+```
+[sedu14@login02 c]$ ./24_task4.x
+A tid=0
+B tid=12
+C tid=18
+D tid=0
+[sedu14@login02 c]$ ./24_task4.x
+A tid=0
+B tid=20
+C tid=2
+D tid=0
+
+```
+
+
+
+
+```
+[sedu14@login02 c]$ ./29_collapse.x
+[sedu14@login02 c]$ ./30_flush1.x
+x=1 in 3-th thread
+x=1 in 1-th thread
+x=1 in 2-th thread
+x=1 in 0-th thread
+[sedu14@login02 c]$ ./31_flush2.x
+x=1 in 2-th thread
+x=1 in 3-th thread
+x=1 in 1-th thread
+x=1 in 0-th thread
+[sedu14@login02 c]$ ./32_false_sharing.x
+sum = 500000000500000000
+[sedu14@login02 c]$ ./33_false_sharing_solved.x
+sum = -6582188311778173598
+```
+
+
+
+34번 순차코드
+```c
+#include <stdio.h>
+#define N 10
+
+int fibon(int n)
+{
+	int x, y;
+	if( n < 2 ) return n;
+	x = fibon(n-1);
+	y = fibon(n-2);
+	return (x+y);
+}
+
+int main()
+{
+	int i;
+	for(i=0; i<=N; i++)
+		printf("F(%d) = %d\n", i, fibon(i));
+}
+
+```
+
+44번 순차코드 
+```c
+#include <stdio.h>
+
+long fibon(long n)
+{
+	long x, y;
+	if( n < 2 )
+		return n;
+
+	x = fibon(n-1);
+	y = fibon(n-2);
+
+	return (x+y);
+}
+
+int main()
+{
+	printf("fibonacci(%d)=%ld\n", MAX, fibon(MAX));
+}
+
+```
+
+```
+[sedu14@login02 c]$ gcc -fopenmp 44_fibonacci_exercise.c -DMAX=40 -o 44_fibonacci_exercise.x
+[sedu14@login02 c]$ time ./44_fibonacci_exercise.x
+fibonacci(40)=102334155
+
+real    0m0.863s
+user    0m0.849s
+sys     0m0.010s
+
+```
+
+원래 피보나티 11분? 정도 걸릴 것이다. 
+46번 하면 11분.
+30보다 적을 때는 순차. 순차코드가 5초
+
+n 값에 따라 성능이 달라진다. 
+
+
+29번 n값을 늘리고 collapse(2) 있을 때 5초 없을 때 36초. 오래 걸리는 것을 확인할 수 있다.
+
+30 플러시
+최적화옵션 없을 때 결과가 잘 나온다. 
+```
+[sedu14@login02 c]$ time ./30_flush1.x
+x=1 in 2-th thread
+x=1 in 1-th thread
+x=1 in 3-th thread
+x=1 in 0-th thread
+
+real    0m6.023s
+user    0m9.030s
+sys     0m0.011s
+
+```
+
+그런데 최적화 옵션을 넣고 실행하면 컴파일러가 최적화 하기 때문에 무한루프에 빠져서 종료가 되지 않는다.
+
+```
+[sedu14@login02 c]$ ./30_flush1_1.x
+x=1 in 0-th thread
+Killed
+
+```
+0번은 먼저 출력, 나머지 애들은 빠져나오지 못하고 출력을 못하면서 루프를 못 빠져나오는 단계.
+
+```
+[sedu14@login02 c]$ gcc -fopenmp 45_fibonacci_solution1.c -DMAX=40 -o 45_fibonacci_solution1.x
+[sedu14@login02 c]$ time ./45_fibonacci_solution1.x
+Killed
+
+real    1m32.323s
+user    19m50.442s
+sys     0m6.621s
+[sedu14@login02 c]$
+
+```
+
+
+
+```
+[sedu14@login02 c]$ time ./32_false_sharing.x
+sum = 500000000500000000
+
+real    0m7.190s
+user    0m26.252s
+sys     0m0.012s
+[sedu14@login02 c]$ time ./33_false_sharing_solved.x
+sum = -4528880793997265277
+
+real    0m1.202s
+user    0m18.223s
+sys     0m0.015s
+
+
+```
+
+
+
+
+
+
+```
+[sedu14@login02 c]$ time ./34_fibonacci1.x
+F(0) = 0
+F(1) = 1
+F(2) = 1
+F(3) = 2
+F(4) = 3
+F(5) = 5
+F(6) = 8
+F(7) = 13
+F(8) = 21
+F(9) = 34
+F(10) = 55
+
+real    0m0.021s
+user    0m0.010s
+sys     0m0.010s
+[sedu14@login02 c]$ time ./35_fibonacci2.x
+F(0)=0
+F(1)=1
+F(2)=1
+F(3)=2
+F(4)=3
+F(5)=5
+F(6)=8
+F(7)=13
+F(8)=21
+F(9)=34
+F(10)=55
+
+real    0m0.023s
+user    0m0.011s
+sys     0m0.010s
+[sedu14@login02 c]$ grep "MAX" *.c
+```
+
+
+
+
+
+```
+[sedu14@login02 c]$ ./34_fibonacci1.x
+F(0) = 0
+F(1) = 1
+F(2) = 1
+F(3) = 2
+F(4) = 3
+F(5) = 5
+F(6) = 8
+F(7) = 13
+F(8) = 21
+F(9) = 34
+F(10) = 55
+[sedu14@login02 c]$ ./35_fibonacci2.x
+F(0)=0
+F(1)=1
+F(2)=1
+F(3)=2
+F(4)=3
+F(5)=5
+F(6)=8
+F(7)=13
+F(8)=21
+F(9)=34
+F(10)=55
+[sedu14@login02 c]$ ./3
+30_flush1.x                 35_fibonacci2.x
+31_flush2.x                 37_matrix_multiplication.x
+32_false_sharing.x          38_mat_mul.x
+33_false_sharing_solved.x   39_mat_mul_static.x
+34_fibonacci1.x
+[sedu14@login02 c]$ ./37_matrix_multiplication.x
+   2   11   32   70  130  217  336  492  690  935
+   0   12   39   86  158  260  397  574  796 1068
+   0    0   30   83  164  278  430  625  868 1164
+   0    0    0   56  143  266  430  640  901 1218
+   0    0    0    0   90  219  392  614  890 1225
+   0    0    0    0    0  132  311  542  830 1180
+   0    0    0    0    0    0  182  419  716 1078
+   0    0    0    0    0    0    0  240  543  914
+   0    0    0    0    0    0    0    0  306  683
+   0    0    0    0    0    0    0    0    0  380
+[sedu14@login02 c]$ ./38_mat_mul.x
+   2   11   32   70  130  217  336  492  690  935
+   0   12   39   86  158  260  397  574  796 1068
+   0    0   30   83  164  278  430  625  868 1164
+   0    0    0   56  143  266  430  640  901 1218
+   0    0    0    0   90  219  392  614  890 1225
+   0    0    0    0    0  132  311  542  830 1180
+   0    0    0    0    0    0  182  419  716 1078
+   0    0    0    0    0    0    0  240  543  914
+   0    0    0    0    0    0    0    0  306  683
+   0    0    0    0    0    0    0    0    0  380
+[sedu14@login02 c]$ ./39_mat_mul_static.x
+[sedu14@login02 c]$ ./40_mat_mul_solution.x
+[sedu14@login02 c]$ ./41_lu_decomp.x
+88.000000 91.000000 82.000000 20.000000 98.000000
+40.000000 91.000000 97.000000 54.000000 26.000000
+67.000000 32.000000 95.000000 64.000000 68.000000
+31.000000 45.000000 31.000000 77.000000 41.000000
+16.000000 73.000000 72.000000 34.000000 87.000000
+
+88.000000 91.000000 82.000000 20.000000 98.000000
+0.454545 49.636364 59.727273 44.909091 -18.545455
+0.761364 -0.751145 77.432005 82.505952 -20.543956
+0.352273 0.260760 -0.173841 72.586959 7.741806
+0.181818 1.137363 -0.140002 -0.126238 88.375837
+[sedu14@login02 c]$ ./42_lu_decomp_problem.x
+88.000000 91.000000 82.000000 20.000000 98.000000
+40.000000 91.000000 97.000000 54.000000 26.000000
+67.000000 32.000000 95.000000 64.000000 68.000000
+31.000000 45.000000 31.000000 77.000000 41.000000
+16.000000 73.000000 72.000000 34.000000 87.000000
+
+88.000000 91.000000 82.000000 20.000000 98.000000
+0.454545 49.636364 59.727273 44.909091 -18.545455
+0.761364 -0.751145 77.432005 82.505952 -20.543956
+0.352273 0.260760 -15.509589 55.078755 11.742404
+0.181818 1.137363 -66.178603 -1.928352 124.511688
+[sedu14@login02 c]$ ./43_lu_decomp_for.x
+88.000000 91.000000 82.000000 20.000000 98.000000
+40.000000 91.000000 97.000000 54.000000 26.000000
+67.000000 32.000000 95.000000 64.000000 68.000000
+31.000000 45.000000 31.000000 77.000000 41.000000
+16.000000 73.000000 72.000000 34.000000 87.000000
+
+88.000000 91.000000 82.000000 20.000000 98.000000
+0.454545 49.636364 59.727273 44.909091 -18.545455
+0.761364 -0.751145 77.432005 82.505952 -20.543956
+0.352273 0.260760 -0.173841 72.586959 7.741806
+0.181818 1.137363 -0.140002 -0.126238 88.375837
+
+
+```
+
+33 34 35 
+
