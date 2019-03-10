@@ -1854,5 +1854,5 @@ F(10)=55
 
 https://github.com/jakezhaojb/Backpropagation-C/blob/master/bp.cpp
 
-
+정리시작.
 
