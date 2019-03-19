@@ -1,0 +1,17 @@
+PROGRAM deadlock
+USE mpi_f08
+INTEGER::nrank,nprocs,i
+INTEGER,PARAMETER::buf_size=1024
+!INTEGER,PARAMETER::buf_size=1024*2   ! deadlock
+REAL(KIND=8),DIMENSION(buf_size)::a,b
+CALL MPI_Init
+CALL MPI_Comm_rank(MPI_COMM_WORLD,nrank)
+IF(nrank==0)THEN
+  CALL MPI_Send(a,buf_size,MPI_REAL8,1,17,MPI_COMM_WORLD)
+  CALL MPI_Recv(b,buf_size,MPI_REAL8,1,19,MPI_COMM_WORLD,MPI_STATUS_IGNORE)
+ELSEIF(nrank==1)THEN
+  CALL MPI_send(a,buf_size,MPI_REAL8,0,19,MPI_COMM_WORLD)
+  CALL MPI_Recv(b,buf_size,MPI_REAL8,0,17,MPI_COMM_WORLD,MPI_STATUS_IGNORE)
+ENDIF
+CALL MPI_Finalize
+END PROGRAM deadlock
