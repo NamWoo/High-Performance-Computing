@@ -323,3 +323,59 @@ int main()
 
 
 
+[sedu14@node8298 C]$ cat waitall.c
+#include <stdio.h>
+#include "mpi.h"
+int main()
+{
+   int rank,size,count,i;
+   float data[100], value[100];
+   MPI_Request ireq[100];
+   MPI_Init(NULL,NULL);
+   MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+   if(rank==0){
+     for(i=0;i<100;i++){
+       data[i]=1.0*(i+1);
+       MPI_Isend(&data[i],1,MPI_FLOAT,1,i,MPI_COMM_WORLD, &ireq[i]);
+     }
+   }else if(rank==1){
+     for(i=0;i<100;i++)
+       MPI_Irecv(&value[i],1,MPI_FLOAT,0,i,MPI_COMM_WORLD,&ireq[i]);
+   }
+   MPI_Waitall(100,ireq,MPI_STATUSES_IGNORE);
+   if(rank==1)printf("value[99]:%f\n",value[99]);
+   MPI_Finalize();
+   return 0;
+}
+[sedu14@node8298 C]$ mpicc waitall.c -o waitall.x
+[sedu14@node8298 C]$ mpirun -np 1 ./waitall.x
+[node8298:55437] *** An error occurred in MPI_Isend
+[node8298:55437] *** reported by process [3912761345,0]
+[node8298:55437] *** on communicator MPI_COMM_WORLD
+[node8298:55437] *** MPI_ERR_RANK: invalid rank
+[node8298:55437] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[node8298:55437] ***    and potentially your MPI job)
+[sedu14@node8298 C]$ mpirun -np 2 ./waitall.x
+value[99]:100.000000
+[sedu14@node8298 C]$ mpirun -np 3 ./waitall.x
+value[99]:100.000000
+[node8298:55498] *** An error occurred in MPI_Waitall
+[node8298:55498] *** reported by process [3917414401,2]
+[node8298:55498] *** on communicator MPI_COMM_WORLD
+[node8298:55498] *** MPI_ERR_REQUEST: invalid request
+[node8298:55498] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[node8298:55498] ***    and potentially your MPI job)
+[sedu14@node8298 C]$ mpirun -np 4 ./waitall.x
+value[99]:100.000000
+[node8298:55566] *** An error occurred in MPI_Waitall
+[node8298:55566] *** reported by process [3904569345,2]
+[node8298:55566] *** on communicator MPI_COMM_WORLD
+[node8298:55566] *** MPI_ERR_REQUEST: invalid request
+[node8298:55566] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[node8298:55566] ***    and potentially your MPI job)
+[node8298:55557] 1 more process has sent help message help-mpi-errors.txt / mpi_errors_are_fatal
+[node8298:55557] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[sedu14@node8298 C]$
+
+
+
