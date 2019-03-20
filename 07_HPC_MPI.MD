@@ -1195,3 +1195,29 @@ myrank: 0,  RECVBUF=3
 ```
 
 
+
+
+### 끝나도 추가 기입
+
+
+```
+[sedu14@node8300 C]$ mpicc hello.c -o hello.x
+[sedu14@node8300 C]$ mpirun -np 3 ./hello.x
+Hello world
+Hello world
+Hello world
+[sedu14@node8300 C]$ mpicc hello_host.c -o hello_host.x
+[sedu14@node8300 C]$ mpirun -np 3 ./hello_host.x
+Hello World.(Process name=node8300, nRank=1, nProcs=3)
+MPI Version 3.1
+Hello World.(Process name=node8300, nRank=0, nProcs=3)
+Hello World.(Process name=node8300, nRank=2, nProcs=3)
+
+
+[sedu14@node8300 C]$ mpirun -np 2 ./send_recv.x
+P:0 Got data from processor 1
+P:0 Got 100 elements
+P:0 value[5]=5.000000
+
+```
+
