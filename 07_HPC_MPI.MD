@@ -895,3 +895,303 @@ RANK: 2  ISEND=  0  0  0  3  3  3
 
 단지 차이는 sendcounts 복수형, 리시브? 단수형. 다 똑같은데 앞의 차이는 게더브이는 리시브파트에 있었다 얘는 센딩 배열. 
 
+
+
+
+
+```
+
+[sedu14@node8300 C]$ mpirun -np 3 ./gather.x
+--------------------------------------------------------------------------
+mpirun was unable to launch the specified application as it could not access
+or execute an executable:
+
+Executable: ./gather.x
+Node: node8300
+
+while attempting to start process rank 0.
+--------------------------------------------------------------------------
+3 total processes failed to start
+[sedu14@node8300 C]$ mpirun -np 3 ./gatherv.x
+irecv=   1   2   2   3   3   3
+irecv=   10   20   20   30   30   30
+
+[sedu14@node8300 C]$ mpirun -np 3 ./gatherv2.x
+myrank: 0   isend=  1  0  0  0  0  0
+myrank: 1   isend=  2  2  0  0  0  0
+myrank: 2   isend=  3  3  3  0  0  0
+
+MYRANK: 0   ISEND=  1  2  2  3  3  3
+
+
+```
+
+### 248
+
+`MPI_REDUCE` 모으는데 값을 gather처럼 배열넣어서 따로 저정하는게 하니라 모으면서 지정된 연산진행
+
+### 251
+
+**순서바꿔도 상관없는 것들**
+
+`MPI_MAXLOC` , `MPI_MINLOC`
+
+최대값 최소값 위치 찾는거로 값이 2개 있어야 한다.
+
+fortran 구조체가 생겨서 같은 데이터타입 묶어서 인덱스 리얼타입으로 정리
+
+`MPI_Reduce(&sum,&tsum,1,MPI_DOUBLE,MPI_SUM, 0, MPI_COMM_WORLD);`
+
+
+```c
+#include <stdio.h>
+#include <mpi.h>
+int main()
+{ 
+  int nrank,ista,iend,i;
+  double A[9]={0.0,}, sum=0.0, tsum=0.0;
+  MPI_Init(NULL,NULL);
+  MPI_Comm_rank(MPI_COMM_WORLD,&nrank);
+  ista=nrank*3;  iend=ista+2;
+  for(i=ista;i<iend+1;i++) A[i]=i+1;
+  sum=0.0;
+  for(i=ista;i<iend+1;i++) sum += A[i];
+  MPI_Reduce(&sum,&tsum,1,MPI_DOUBLE,MPI_SUM, 0, MPI_COMM_WORLD);
+  if(nrank==0) printf("rank(%d):sum=%.2f\n",nrank,tsum);
+
+  tsum=0;
+  if(nrank==0){
+    //tsum=sum;
+    MPI_Reduce(MPI_IN_PLACE,&tsum,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+    printf("RANK(%d):SUM=%.2f\n",nrank,tsum);
+  } 
+  else{
+    MPI_Reduce(&sum, &tsum,1,MPI_DOUBLE,MPI_SUM, 0, MPI_COMM_WORLD);
+  }  
+  MPI_Finalize();
+  return 0;
+}
+
+```
+
+
+```
+[sedu14@node8300 C]$ mpicc reduce.c -o reduce.x
+
+[sedu14@node8300 C]$ mpirun -np 3 ./reduce.x
+rank(0):sum=45.00
+RANK(0):SUM=39.00
+
+```
+
+각자 부분합. 1번쨰는 6 다음에 4개 15 더해서 15구해서 789더해 24 한 뒤 reduction
+
+
+### 257 
+MAXLOC
+
+
+```c
+#include <stdio.h>
+#include <mpi.h>
+int main()
+{
+  int nrank,i; // 타입 맞추기 그리고 초기화
+  double A[3];
+  struct ddt{
+    double val;
+    int rank;
+  };
+  struct ddt in[3],out[3];
+  MPI_Init(NULL,NULL);
+  MPI_Comm_rank(MPI_COMM_WORLD,&nrank);
+  if(nrank==0) A[0]=9, A[1]=5, A[2]=2;
+  if(nrank==1) A[0]=8, A[1]=6, A[2]=1;
+  if(nrank==2) A[0]=7, A[1]=4, A[2]=3; // 배열값을 가지고
+  for(i=0;i<3;i++) in[i].val=A[i],  in[i].rank=nrank; // 초기화
+
+  // 센드와 리시브 버퍼 배열값 동일, 데이터3개, 타입은 더블, 인트타입합친거
+  // MAXLOC 지정후 결과값은 0에 담아라
+  MPI_Reduce(in,out,3,MPI_DOUBLE_INT,MPI_MAXLOC,0,MPI_COMM_WORLD);
+  if(nrank==0){
+    printf("max val : %.2f  %.2f  %2.f\n",out[0].val, out[1].val, out[2].val);
+    printf("max rank: %d  %d  %d\n",out[0].rank, out[1].rank, out[2].rank);
+  }
+  MPI_Finalize();
+  return 0;
+}
+
+```
+rank 값 초기화,
+
+```
+[sedu14@node8300 C]$ mpicc reduce2.c -o reduce2.x
+
+[sedu14@node8300 C]$ mpirun -np 3 ./reduce2.x
+max val : 9.00  6.00   3
+max rank: 0  1  2
+
+```
+
+
+### 261
+
+
+
+
+
+
+
+### 264
+
+MPI_ALLTOALL
+
+이걸 하나의 배열로 본다면 이거랑 transpose 된 형태. 
+
+
+
+
+
+```c
+#include <stdio.h>
+#include <mpi.h>
+int main()
+{
+  int isend[3],irecv[3];
+  int i,nprocs,myrank;
+  MPI_Init(NULL,NULL);
+  MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+  for(i=0;i<nprocs;i++) isend[i]=1+i+nprocs*myrank;
+  printf("myrank:%d  isend=%d  %d  %d\n",myrank,isend[0],isend[1],isend[2]);
+  MPI_Alltoall(isend,1,MPI_INT, irecv,1,MPI_INT,MPI_COMM_WORLD);
+  printf("myrank:%d  irecv=%d  %d  %d\n",myrank,irecv[0],irecv[1],irecv[2]);
+
+  for(i=0;i<3;i++) irecv[i]=isend[i];
+  MPI_Alltoall(MPI_IN_PLACE,1,MPI_INTEGER,irecv,1,MPI_INTEGER,MPI_COMM_WORLD);
+  printf("MYRANK:%d  IRECV=%d  %d  %d\n",myrank,irecv[0],irecv[1],irecv[2]);
+  MPI_Finalize();
+  return 0;
+}
+
+```
+
+
+```
+
+[sedu14@node8300 C]$ mpirun -np 3 ./alltoall.x
+myrank:0  isend=1  2  3
+myrank:1  isend=4  5  6
+myrank:2  isend=7  8  9
+myrank:0  irecv=1  4  7
+myrank:1  irecv=2  5  8
+myrank:2  irecv=3  6  9
+MYRANK:1  IRECV=2  5  8
+MYRANK:0  IRECV=1  4  7
+MYRANK:2  IRECV=3  6  9
+```
+
+
+```c
+#include <stdio.h>
+#include <mpi.h>
+int main()
+{
+  int isend[6]={1,2,2,3,3,3}, irecv[9]={0,};
+  int iscnt[3]={1,2,3}, isdsp[3]={0,1,3}, ircnt[3], irdsp[3];
+  int myrank,nprocs,i;
+  MPI_Init(NULL,NULL);
+  MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+  for(i=0;i<=6;i++) isend[i-1]=nprocs*myrank+isend[i-1];
+  for(i=0;i<3;i++){
+    if(myrank==0) ircnt[i]=1,irdsp[i]=i;
+    else if(myrank==1) ircnt[i]=2, irdsp[i]=2*i;
+    else if(myrank==2) ircnt[i]=3, irdsp[i]=3*i;
+  }
+  MPI_Alltoallv(isend,iscnt,isdsp,MPI_INT, irecv,ircnt,irdsp,MPI_INT,MPI_COMM_WORLD);
+  printf("myrank %d  irecv=",myrank);
+  for(i=0;i<9;i++) printf("  %d",irecv[i]);
+  printf("\n");
+  MPI_Finalize();
+  return 0;
+}
+
+
+```
+
+
+```
+[sedu14@node8300 C]$ mpirun -np 3 ./alltoallv.x
+myrank 0  irecv=  1  4  7  0  0  0  0  0  0
+myrank 1  irecv=  2  2  5  5  8  8  0  0  0
+myrank 2  irecv=  3  3  3  6  6  6  9  9  9
+
+```
+
+alltoall이 많이 어렵고 실제 코딩에서는 더 많이 복잡하다.
+
+### 278
+
+MPI_REDUCE_SCATTER_BLOCK
+
+
+
+
+```c
+#include <stdio.h>
+#include <mpi.h>
+int main()
+{
+  int sendbuf[6]={1,2,2,3,3,3}, recvbuf[3]={0,}, recvcnt[3]={1,2,3};
+  int myrank;
+  MPI_Init(NULL,NULL);
+  MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+  MPI_Reduce_scatter(sendbuf,recvbuf,recvcnt,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+  printf("myrank: %d recvbuf=%d   %d   %d\n",myrank,recvbuf[0],recvbuf[1],recvbuf[2]);
+  MPI_Finalize();
+  return 0;
+}
+
+```
+
+
+```
+[sedu14@node8300 C]$ mpirun -np 3 ./reduce_scatter.x
+myrank: 0 recvbuf=3   0   0
+myrank: 1 recvbuf=6   6   0
+myrank: 2 recvbuf=9   9   9
+```
+
+
+```c
+#include <stdio.h>
+#include <mpi.h>
+int main()
+{ 
+  int myrank,sendbuf[3]={1,2,3}, recvbuf,RECVBUF1[3]={1,2,3};
+  MPI_Init(NULL,NULL);
+  MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+  MPI_Reduce_scatter_block(sendbuf,&recvbuf,1,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+  printf("myrank: %d,  recvbuf=%d\n",myrank,recvbuf);
+
+  MPI_Reduce_scatter_block(MPI_IN_PLACE,RECVBUF1,1,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+  printf("myrank: %d,  RECVBUF=%d\n",myrank,RECVBUF1[0]);
+  MPI_Finalize();
+  return 0;
+}
+
+```
+
+
+```
+[sedu14@node8300 C]$ mpirun -np 3 ./reduce_scatter_block.x
+myrank: 0,  recvbuf=3
+myrank: 1,  recvbuf=6
+myrank: 1,  RECVBUF=6
+myrank: 2,  recvbuf=9
+myrank: 2,  RECVBUF=9
+myrank: 0,  RECVBUF=3
+```
+
+
