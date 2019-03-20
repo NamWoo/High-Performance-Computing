@@ -321,7 +321,7 @@ int main()
 
 ```
 
-
+```
 
 [sedu14@node8298 C]$ cat waitall.c
 #include <stdio.h>
@@ -377,7 +377,7 @@ value[99]:100.000000
 [node8298:55557] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
 [sedu14@node8298 C]$
 
-
+```
 
 ---
 
