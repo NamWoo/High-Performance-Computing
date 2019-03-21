@@ -253,3 +253,294 @@ Error: Syntax error in argument list at (1)
 [sedu14@node8289 to]$
 
 ```
+
+
+
+
+```
+
+
+[sedu14@login03 Codes]$ time mpirun -np 8 ./pi1.x
+--------------------------------------------------------------------------
+WARNING: No preset parameters were found for the device that Open MPI
+detected:
+
+  Local host:            login03
+  Device name:           i40iw0
+  Device vendor ID:      0x8086
+  Device vendor part ID: 14291
+
+Default device parameters will be used, which may result in lower
+performance.  You can edit any of the files specified by the
+btl_openib_device_param_files MCA parameter to set values for your
+device.
+
+NOTE: You can turn off this warning by setting the MCA parameter
+      btl_openib_warn_no_device_params_found to 0.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+No OpenFabrics connection schemes reported that they were able to be
+used on a specific port.  As such, the openib BTL (OpenFabrics
+support) will be disabled for this port.
+
+  Local host:           login03
+  Local device:         i40iw0
+  Local port:           1
+  CPCs attempted:       rdmacm, udcm
+--------------------------------------------------------------------------
+ista=250000001, iend =375000000
+ista=875000001, iend =1000000000
+ista=1, iend =125000000
+ista=375000001, iend =500000000
+ista=625000001, iend =750000000
+ista=750000001, iend =875000000
+ista=125000001, iend =250000000
+ista=500000001, iend =625000000
+numerical pi = 3.141592653589769
+analytical pi = 3.141592653589793
+Error = 2.442491E-14
+[login03:118329] 23 more processes have sent help message help-mpi-btl-openib.txt / no device params found
+[login03:118329] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[login03:118329] 15 more processes have sent help message help-mpi-btl-openib-cpc-base.txt / no cpcs for port
+
+real    0m2.557s
+user    0m13.425s
+sys     0m1.367s
+[sedu14@login03 Codes]$
+
+
+```
+
+
+
+```
+[sedu14@login03 Codes]$ time mpirun -np 12 ./pi1.x
+--------------------------------------------------------------------------
+WARNING: No preset parameters were found for the device that Open MPI
+detected:
+
+  Local host:            login03
+  Device name:           i40iw0
+  Device vendor ID:      0x8086
+  Device vendor part ID: 14291
+
+Default device parameters will be used, which may result in lower
+performance.  You can edit any of the files specified by the
+btl_openib_device_param_files MCA parameter to set values for your
+device.
+
+NOTE: You can turn off this warning by setting the MCA parameter
+      btl_openib_warn_no_device_params_found to 0.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+No OpenFabrics connection schemes reported that they were able to be
+used on a specific port.  As such, the openib BTL (OpenFabrics
+support) will be disabled for this port.
+
+  Local host:           login03
+  Local device:         i40iw0
+  Local port:           1
+  CPCs attempted:       rdmacm, udcm
+--------------------------------------------------------------------------
+ista=500000003, iend =583333335
+ista=1, iend =83333334
+ista=166666669, iend =250000002
+ista=666666669, iend =750000001
+ista=250000003, iend =333333336
+ista=333333337, iend =416666669
+ista=750000002, iend =833333334
+ista=833333335, iend =916666667
+ista=916666668, iend =1000000000
+ista=583333336, iend =666666668
+ista=83333335, iend =166666668
+ista=416666670, iend =500000002
+numerical pi = 3.141592653589860
+analytical pi = 3.141592653589793
+Error = 6.661338E-14
+[login03:139380] 35 more processes have sent help message help-mpi-btl-openib.txt / no device params found
+[login03:139380] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[login03:139380] 23 more processes have sent help message help-mpi-btl-openib-cpc-base.txt / no cpcs for port
+
+real    0m2.080s
+user    0m13.668s
+sys     0m2.119s
+
+
+```
+
+
+```
+
+[sedu14@login03 Codes]$ time mpirun -np 2 ./pi1.x
+--------------------------------------------------------------------------
+WARNING: No preset parameters were found for the device that Open MPI
+detected:
+
+  Local host:            login03
+  Device name:           i40iw0
+  Device vendor ID:      0x8086
+  Device vendor part ID: 14291
+
+Default device parameters will be used, which may result in lower
+performance.  You can edit any of the files specified by the
+btl_openib_device_param_files MCA parameter to set values for your
+device.
+
+NOTE: You can turn off this warning by setting the MCA parameter
+      btl_openib_warn_no_device_params_found to 0.
+--------------------------------------------------------------------------
+[login03:145540] [[15059,0],0] ORTE_ERROR_LOG: Out of resource in file util/show_help.c at line 501
+--------------------------------------------------------------------------
+No OpenFabrics connection schemes reported that they were able to be
+used on a specific port.  As such, the openib BTL (OpenFabrics
+support) will be disabled for this port.
+
+  Local host:           login03
+  Local device:         i40iw0
+  Local port:           1
+  CPCs attempted:       rdmacm, udcm
+--------------------------------------------------------------------------
+ista=1, iend =500000000
+ista=500000001, iend =1000000000
+[login03:145540] 4 more processes have sent help message help-mpi-btl-openib.txt / no device params found
+[login03:145540] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[login03:145540] 3 more processes have sent help message help-mpi-btl-openib-cpc-base.txt / no cpcs for port
+numerical pi = 3.141592653589901
+analytical pi = 3.141592653589793
+Error = 1.079137E-13
+
+real    0m7.653s
+user    0m13.198s
+sys     0m0.308s
+```
+
+
+```c
+
+#include <stdio.h>
+#include <mpi.h>
+#include <math.h>
+#define num_steps 1000000000
+
+int min(int x, int y){
+
+    int v;
+    if (x>=y) v=y;
+    else v=x;
+    return v;
+}
+void para_range(int n1, int n2, int nprocs, int myrank, int *ista, int *iend){
+
+    int iwork1, iwork2;
+    iwork1 = (n2-n1+1)/nprocs;
+    iwork2 = (n2-n1+1)%nprocs;
+    *ista = myrank*iwork1 + n1 + min(myrank,iwork2);
+    *iend = *ista + iwork1 - 1;
+    if(iwork2> myrank) *iend = *iend + 1;
+}
+
+void main(int argc, char *argv[]){
+    double sum, step, x, pi;
+    double tsum;
+    int i, nprocs, myrank;
+    int ista, iend;
+    MPI_Status status;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
+    sum=0.0;
+    step=1./(double)num_steps;
+
+    para_range(1,num_steps, nprocs, myrank, &ista, &iend);
+    printf("ista=%d, iend =%d \n", ista, iend);
+
+    for(i=ista; i<=iend; i++){
+
+        x=(i-0.5)*step;
+        sum = sum+4.0/(1.0+x*x);
+    }
+
+    MPI_Reduce(&sum, &tsum, 1, MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+
+    if(myrank==0){
+        pi=step*tsum;
+        printf("numerical pi = %.15lf \n", pi);
+        printf("analytical pi = %.15f \n", acos(-1.0));
+        printf("Error = %E \n", fabs(acos(-1.0)-pi));
+
+    }
+
+    MPI_Finalize();
+
+}
+
+
+```
+
+
+
+```c
+
+#include <stdio.h>
+#include <mpi.h>
+#define n 11
+
+
+
+
+
+int min(int x, int y){
+
+    int v;
+    if (x>=y) v=y;
+    else v=x;
+    return v;
+}
+void para_range(int n1, int n2, int nprocs, int myrank, int *ista, int *iend){
+
+
+    int iwork1, iwork2;
+    iwork1 = (n2-n1+1)/nprocs;
+    iwork2 = (n2-n1+1)%nprocs;
+    *ista = myrank*iwork1 + n1 + min(myrank,iwork2);
+    *iend = *ista + iwork1 - 1;
+    if(iwork2> myrank) *iend = *iend + 1;
+}
+
+int main(int argc, char *argv[]){
+    void para_range(int,int,int,int,int*,int*);
+    int min(int, int);
+    int i, nprocs, myrank;
+    double a[n], b[n];
+    int ista, iend, ista2, iend1, inext, iprev;
+    MPI_Request isend1, isend2, irecv1, irecv2;
+    MPI_Status istatus;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    para_range(0, n-1, nprocs, myrank, &ista, &iend);
+    ista2 = ista; iend1 = iend;
+    if(myrank==0) ista2=1;
+    if(myrank==nprocs-1) iend1=n-2;
+    inext=myrank+1; iprev=myrank-1;
+
+    if(myrank==nprocs-1) inext=MPI_PROC_NULL;
+    if(myrank==0) iprev=MPI_PROC_NULL;
+    MPI_Isend(&b[iend], 1, MPI_DOUBLE, inext, 1, MPI_COMM_WORLD, &isend1);
+    MPI_Isend(&b[ista], 1, MPI_DOUBLE, iprev, 1, MPI_COMM_WORLD, &isend2);
+    MPI_Irecv(&b[ista-1], 1, MPI_DOUBLE, iprev, 1, MPI_COMM_WORLD, &irecv1);
+    MPI_Irecv(&b[iend+1], 1, MPI_DOUBLE, inext, 1, MPI_COMM_WORLD, &irecv1);
+    MPI_Wait(&isend1, &istatus);
+    MPI_Wait(&isend2, &istatus);
+    MPI_Wait(&irecv1, &istatus);
+    MPI_Wait(&irecv2, &istatus);
+
+    for(i=ista2; i<=iend1; i++) a[i] = b[i-1] + b[i+1];
+    MPI_Finalize();
+
+}
+
+
+
+```
