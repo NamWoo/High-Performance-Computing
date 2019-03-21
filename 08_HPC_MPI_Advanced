@@ -5,3 +5,251 @@
 
 
 
+# 21일
+
+* 커뮤니케이터를 쪼개서 만들 수도 있다.
+* 커뮤니케이터가 2개일때 자기내들끼리 통신은 어제처럼
+* 커뮤니케이터끼리 서로 접속해서 메모리접속할 때? 이건 오늘.
+* 오늘할 토플로지
+
+### 
+
+`select=2:ncpus=4:mpiprocs=4:ompthreads=1 -l walltime=04:00:00 -q debug`
+
+* `select=2` 노드2개 할당
+* `ncpus=4` 각 노드당 CPU 4개 확보
+* `mpiprocs=4` mpi process 4개 할당
+* `ompthreads=1` openmp 안쓰니까 1개만
+* `-l` 자원요청
+* `exit` 다 쓰고 꼭 빠져나오기
+```
+[sedu14@login04 C]$ qsub -V -I -l select=2:ncpus=4:mpiprocs=4:ompthreads=1 -l walltime=04:00:00 -q debug
+qsub: waiting for job 2010096.pbs to start
+qsub: job 2010096.pbs ready
+```
+
+### 14 토폴로지
+
+좌표형태지만 링타입도 만들 수 있고 그래프타입 등 다양하게 만들 수 있다. 가장 만힝 쓰는게 직교좌표. 그래서 그림을 가져왔다.
+* 토폴로지 만들면서 랭크를 재정리
+* 좌표형태는 코드가 쉬워질 수있다.
+* 주기성을 줘서 반복? 3번 옆에 1번 있다고 가정, 할 수 있다. 
+* 없다면 MPIPROCNULL 통신시도 하지 않는다
+
+카티션좌표개
+
+카티시프트 6번의 0방향(위쪽)에 있는 값이 뭐냐? 이웃한 랭크값
+
+MPI CART SHIFT
+
+### 16 
+MPI_DIMS_CREATE
+
+포트란 서브루틴 호출 때는 CALL
+
+### 18
+
+직교좌표만들때 쓰는거 CART_CREATE
+새로운 커뮤니케이터, 몇차원만들꺼냐?
+
+### 20
+
+2차원, MPI_DIMS에서 정의한걸 사용, 리오더는 TRUE, comm_cart
+
+
+```fortran
+program cart_create
+use mpi_f08
+implicit none
+integer, parameter::ndim=2
+integer::myrank,nprocs, dims(ndim)=0, newprocs, newrank
+logical::reorder=.true.,periods(ndim)=.false.
+type(mpi_comm)::COMM_CART
+call MPI_init
+call MPI_Comm_rank(MPI_COMM_WORLD, myrank)
+CALL MPI_COMM_SIZE(MPI_COMM_WORLD,nprocs)
+call MPI_DIMS_CREATE(NPROCS, NDIM,DIMS)
+IF(MYRANK==0) PRINT*, 'DIMS=',DIMS
+CALL MPI_CART_CREATE(MPI_COMM_WORLD,NDIM,DIMS,PERIODS,REORDER,COMM_CART)
+CALL MPI_COMM_SIZE(COMM_CART, NEWPROCS)
+CALL MPI_COMM_RANK(COMM_CART, NEWRANK);
+PRINT*, 'MYRANK:', MYRANK,'NEWRANK:',NEWRANK
+CALL MPI_FINALIZE
+end program cart_create
+```
+
+```
+[sedu14@node8289 to]$ vi 01.f90
+[sedu14@node8289 to]$ mpif90 01.f90 -o 01.x
+[sedu14@node8289 to]$ mpirun -np 12 ./01.x
+ DIMS=           4           3
+ MYRANK:           0 NEWRANK:           0
+ MYRANK:           2 NEWRANK:           2
+ MYRANK:           3 NEWRANK:           3
+ MYRANK:           4 NEWRANK:           4
+ MYRANK:           5 NEWRANK:           5
+ MYRANK:           6 NEWRANK:           6
+ MYRANK:           7 NEWRANK:           7
+ MYRANK:           1 NEWRANK:           1
+ MYRANK:           8 NEWRANK:           8
+ MYRANK:           9 NEWRANK:           9
+ MYRANK:          10 NEWRANK:          10
+ MYRANK:          11 NEWRANK:          11
+```
+
+새로만들어진 커뮤니케이터, 
+
+### 26
+
+```
+
+
+```
+
+### 28
+
+### 33 cart shift
+
+```fortran
+
+PROGRAM CART_SHIFT
+use mpi_f08
+implicit none
+type(mpi_comm)::OLDCOMM, NEWCOMM
+integer::ndims=2, DIMSIZE(0:1)
+LOGICAL::PERIODS(0:1),REORDER
+integer::myrank,nprocs,I,J,RANK
+INTEGER::COORDS(0:1)
+INTEGER::DIRECTION, DISP,SRC,DEST
+
+call MPI_init
+call MPI_Comm_rank(MPI_COMM_WORLD, myrank)
+CALL MPI_COMM_SIZE(MPI_COMM_WORLD,nprocs)
+
+OLDCOMM=MPI_COMM_WORLD
+DIMSIZE=(/3,2/)
+PERIODS=(/.TRUE.,.FALSE./)
+REORDER=.TRUE.
+
+CALL MPI_CART_CREATE(OLDCOMM, NDIMS, DIMSIZE,PERIODS, REORDER, NEWCOMM)
+DIRECTION=0; DISP=1
+CALL MPI_CART_SHIFT(NEWCOMM, DIRECTION, DISP,SRC, DEST)
+PRINT*, 'RANK:', MYRANK,'SOURCE:',SRC, 'DESTINATION=',DEST
+CALL MPI_FINALIZE
+end program CART_SHIFT
+
+```
+
+
+```
+[sedu14@node8289 to]$ mpif90 cart_shift.f90 -o cart_shift.x
+
+[sedu14@node8289 to]$ mpirun -np 6 ./cart_shift.x
+ RANK:           0 SOURCE:           4 DESTINATION=           2
+ RANK:           1 SOURCE:           5 DESTINATION=           3
+ RANK:           2 SOURCE:           0 DESTINATION=           4
+ RANK:           3 SOURCE:           1 DESTINATION=           5
+ RANK:           4 SOURCE:           2 DESTINATION=           0
+ RANK:           5 SOURCE:           3 DESTINATION=           1
+
+```
+
+### 39 neighborhood_allgather
+
+```fortran
+
+PROGRAM neighborhood_allgather
+use mpi_f08
+implicit none
+integer::myrank, procs
+type(mpi_comm)::COMM_CART
+integer::ndim=2, DIMS(2), COORDS(2), RECVBUF(4)=-10
+LOGICAL::PERIODS(2)=.FALSE., REORDER=.FALSE.
+
+call MPI_init
+call MPI_Comm_rank(MPI_COMM_WORLD, myrank)
+CALL MPI_COMM_SIZE(MPI_COMM_WORLD,procs)
+
+DIMS=(/4,4/)
+
+CALL MPI_CART_CREATE(MPI_COMM_WORLD, NDIM, DIMS, PERIODS,REORDER,COMM_CART)
+CALL mpi_CART_COORDS(COMM_CART, MYRANK, NDIM, COORDS)
+CALL MPI_NEIGHBORHOOD_ALLGATHER(MYRANK,1,MPI_INTEGER,RECVBUF,1,MPI_INTEGER,COMM_CART)
+PRINT*,'MYRANK:', MYRANK,'RECVBUF:',RECVBUF
+CALL MPI_FINALIZE
+end program neighborhood_allgather
+
+
+```
+
+### 43 
+
+### 50 win fence 
+
+동기화, 메모리 펜스와 비슷한 개념
+
+mpi foot 비동기함수
+
+winfence 지정하면 다른 프로세서가 접근 가능,
+
+### 62 accumulate
+
+다 있는데 op, win. 연산취하는, 어제 배우는 reduce 연산 그대로 사용 가능.
+
+
+###
+
+* https://twitter.com/cvpr2019
+* https://s2019.siggraph.org/conference/programs-events/computer-animation-festival/electronic-theater/electronic-theater-submissions/
+* https://iclr.cc/
+* http://iccv2019.thecvf.com/
+* https://aideadlin.es/?sub=ML,CV,NLP,RO,SP,DM
+* https://brunch.co.kr/@needleworm/61
+
+
+### 70 get_accumulate
+
+```fortan
+PROGRAM get_accumulate
+use mpi_f08
+implicit none
+integer::a,b=0, myrank
+integer(kind=MPI_ADDRESS_KIND)::size, disp
+type(MPI_Win)::win
+
+CALL MPI_Init
+CALL MPI_Comm_rank(MPI_COMM_WORLD, myrank)
+if(myrank==0) a=1
+if(myrank==1) a=10
+if(myrank==2) a=100
+print*,'myrank:',myrank,'a=', a
+size=storage_size(a)/8
+CALL MPI_Win_create(a,size,1,MPI_INFO_NULL,MPI_COMM_WORLD,win)
+CALL MPI_Win_fence(0,win)
+disp =0
+if(myrank==0) then
+    CALL
+MPI_Get_accumulate(a,1,MPI_Integer,b,1,MPI_Integer,2,disp,1,&MPI_Integer,MPI_Sum,win)
+endif
+
+CALL MPI_Win_fence(0,win)
+print*,'myrank:',myrank, 'A=', a
+print*,'myrank:',myrank, 'A=', b
+CALL MPI_Win_free(win)
+CALL MPI_FINALIZE
+end program get_accumulate
+
+```
+
+
+```
+
+[sedu14@node8289 to]$ mpif90 get_accumulate.f90 -o get_accumulate.x
+get_accumulate.f90:19:69:
+
+     call MPI_Get_accumulate(a,1,MPI_Integer,b,1,MPI_Integer,2,disp,1,&MPI_Integer,MPI_SUM,win)
+                                                                     1
+Error: Syntax error in argument list at (1)
+[sedu14@node8289 to]$
+
+```
