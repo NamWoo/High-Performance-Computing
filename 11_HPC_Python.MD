@@ -31,6 +31,10 @@ mutiprocessing, threading 같은 라이브러리가 아니라 처음 들어보�
 
 나이츠렌딩 1.4 코어, 상업용 판매하는거 3코어 이상 더 느릴 수 있다.
 
+## 받아오기
+
+wget http.... 웹에서 바로 받아오기
+
 ## 병렬
 쓰레드, 프로세싱 크게는 두가지다
 
@@ -73,6 +77,74 @@ mpi는 라이브러리 형태 함수. 그래서 파이썬에서도 mpi가 된다
 
 
 
+### pypar
+1. pypar 사용하기 위해선 openmpi 설치 필요.
+2. openmpi는 컴파일러 또 필요
+
+다운받은 후
+c코드는 openmpi 떙겨주는거 setup.py.. 찾아서 실행.
+
+처음 설치할 때
+```
+[sedu07@node8282 tpy]$ module li
+Currently Loaded Modulefiles:
+  1) craype-network-opa   3) python/3.7           5) openmpi/3.1.0
+  2) craype-mic-knl       4) gcc/7.2.0
+[sedu07@node8282 tpy]$ wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/pypar/pypar-2.1.5_108.tgz
+--2019-04-01 16:45:00--  https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/pypar/pypar-2.1.5_108.tgz
+Resolving storage.googleapis.com (storage.googleapis.com)... 172.217.24.48, 2404:6800:4005:807::2010
+Connecting to storage.googleapis.com (storage.googleapis.com)|172.217.24.48|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 129844 (127K) [application/octet-stream]
+Saving to: ‘pypar-2.1.5_108.tgz’
+
+100%[======================================>] 129,844     --.-K/s   in 0.1s
+
+2019-04-01 16:45:01 (1.09 MB/s) - ‘pypar-2.1.5_108.tgz’ saved [129844/129844]
+
+[sedu07@node8282 tpy]$
+
+```
+
+만든 프로세스 식별버ㅗㄴ호 받아오는게 rank() , 각자 이름에 맞는 메모리가 각각 
+같은 렝크지만 다른 값을 가지고 있다.
+
+전체프로세스을 알아야 몇등분? 그게 size. 전체갯수.
+
+그 밑은 
+
+send 리시브 예제..
+rank가 0인 아이는 그걸 실행, 다른 아이는 또 다른 것을 실행ㄱ
+
+
+
+a를 1 번 누구에게
+pypar.send(a,destination=1)
+
+그리고 나머지아이는 0번에서 받아오기
+
+
+
+
+```python
+#!/usr/bin/env python
+
+import pypar
+rank, size = pypar.rank(), pypar.size()
+
+if rank ==0:
+    a = 1
+    pypar.send(a, destination=1)
+else:
+    a=0
+    a= pypar.receive(source =0)
+
+print "a= %d in rank : %d\n"%(a, rank)
+
+pypar.finalize()
+
+
+```
 
 
 
@@ -86,7 +158,9 @@ mpi는 라이브러리 형태 함수. 그래서 파이썬에서도 mpi가 된다
 
 
 
-## 수업시간 실습
+
+
+# 수업시간 실습
 
 
 ### 선형대수 실습
