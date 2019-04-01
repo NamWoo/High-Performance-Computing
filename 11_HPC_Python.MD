@@ -1,3 +1,35 @@
+
+```
+#!/usr/bin/env python
+
+import pypar
+rank, size = pypar.rank(), pypar.size()
+
+if rank ==0:
+    a = 1
+    pypar.send(a, destination=1)
+else:
+    a=0
+    a= pypar.receive(source =0)
+
+print("a= %d in rank : %d\n"%(a, rank))
+
+pypar.finalize()
+
+
+
+
+
+[sedu07@node8282 tpy]$ mpirun -np 4 ./pi.py
+Pypar (version 2.1.5) initialised MPI OK with 4 processors
+a= 1 in rank : 0
+
+a= 1 in rank : 1
+
+```
+
+
+
 * 일정 : 2019/04/01 - 2019/04/04 (4일 중 1일차)
 * 장소 : 한국과학기술정보연구원(대전 카이스트)
 
