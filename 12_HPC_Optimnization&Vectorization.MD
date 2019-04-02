@@ -25,3 +25,104 @@ AoS, SoA 구조체의 배열, 배열의 구조체, 어레이오브구조체,
 * 케시미스 메모리에 가서 직접 가져와야할 때 케시올리고 cpu가 활용. 메모리에 가져오는게 시간 오래 걸림
 
 
+## 실습
+
+
+wallclock 체킹
+
+
+```fortran
+program name
+implicit none
+integer, parameter::n=10000
+integer::i,j
+integer(kind=8)::stime, etime, c_rate
+real::stime1, etime1
+call system_clock(stime,c_rate)
+call sleep(1)
+call system_clock(etime)
+print*, 'system_clock:',(etime-stime)/dble(c_rate)
+
+call cpu_time(stime1)
+call sleep(1)
+call cpu_time(etime1)
+print*, 'cpu_time:',(etime1-stime1)
+end program name
+
+```
+
+
+```
+[sedu27@login01 Exercise]$ gfortran wc.f90 -o wc.x
+[sedu27@login01 Exercise]$ ./wc.x
+ system_clock:   1.0000812250000000
+ cpu_time:   3.90000641E-05
+
+[sedu27@login01 Exercise]$ time ./wc.x
+ system_clock:   1.0000858580000000
+ cpu_time:   3.50009650E-05
+
+real    0m2.027s
+user    0m0.015s
+sys     0m0.011s
+
+```
+
+
+
+
+
+
+```c
+
+#include <stdio.h>
+#include <unistd.h>
+#include <time.h>
+double WallTime()
+{
+    struct timespec tp;
+    clock_gettime(CLOCK_REALTIME, &tp);
+    return ((double)tp.tv_sec + (double)tp.tv_nsec * 1.e-9);
+}
+
+int main(void){
+    int i, j;
+    clock_t start, end;
+    double stime, etime;
+    double cpu_time, wallclock;
+    stime=WallTime();
+    sleep(1);
+    etime=WallTime();
+    wallclock=etime-stime;
+    printf("Wallclock time : %f\n", wallclock);
+
+    start=clock();
+    sleep(1);
+    end=clock();
+    cpu_time=((double)(end-start))/CLOCKS_PER_SEC;
+    printf("cpu time : %f\n", cpu_time);
+    return 0;
+
+}
+```
+
+
+```
+[sedu27@login01 Exercise]$ gcc wc_c.c -o wc_c.x
+[sedu27@login01 Exercise]$ ./wc_c.x
+Wallclock time : 1.000077
+cpu time : 0.000000
+[sedu27@login01 Exercise]$ time ./wc_c.x
+Wallclock time : 1.000085
+cpu time : 0.000000
+
+real    0m2.027s
+user    0m0.012s
+sys     0m0.013s
+[sedu27@login01 Exercise]$
+
+```
+
+
+
+
