@@ -125,4 +125,46 @@ sys     0m0.013s
 
 
 
+## 오후
 
+```
+[sedu27@node8283 C]$ scp 150.183.150.13:/tmp/Solution.tgz
+usage: scp [-12346BCpqrv] [-c cipher] [-F ssh_config] [-i identity_file]
+           [-l limit] [-o ssh_option] [-P port] [-S program]
+           [[user@]host1:]file1 ... [[user@]host2:]file2
+```
+
+
+
+
+```python
+import numpy as np
+N = 100
+
+
+a = np.random.normal(size=(2,2))
+b = np.random.normal(size=(2,2))
+c = np.random.normal(size=(2,2))
+
+for i in range(N):
+    for j in range(N):
+        for k in range(N):
+            c[i][j] = c[i][j] + a[i][k] * b[k][j]
+
+
+print(c[1][1])
+
+
+
+
+```
+
+
+```
+[sedu27@node8283 Exercise]$ python t01.py
+Traceback (most recent call last):
+  File "t01.py", line 12, in <module>
+    c[i][j] = c[i][j] + a[i][k] * b[k][j]
+IndexError: index 2 is out of bounds for axis 0 with size 2
+
+```
