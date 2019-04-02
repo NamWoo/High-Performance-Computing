@@ -1,0 +1,23 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+
+Begin optimization report for: main(void)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at Addvec.c(21,3)
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization. First dependence is shown below. Use level 5 report for details
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:rand(void) (22:19) and call:rand(void) (23:19)
+LOOP END
+
+LOOP BEGIN at Addvec.c(27,3)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at Addvec.c(28,5)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+LOOP END
+===========================================================================

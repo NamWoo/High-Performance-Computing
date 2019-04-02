@@ -1,0 +1,26 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+
+Begin optimization report for: ADDVEC
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at AddVec.f90(9,6)
+   remark #15300: LOOP WAS VECTORIZED
+LOOP END
+
+LOOP BEGIN at AddVec.f90(10,6)
+   remark #15300: LOOP WAS VECTORIZED
+LOOP END
+
+LOOP BEGIN at AddVec.f90(13,1)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at AddVec.f90(14,3)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+LOOP END
+===========================================================================
