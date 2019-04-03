@@ -1,0 +1,32 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+
+Begin optimization report for: FUNC
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at noncontiguous.f90(4,1)
+   remark #15300: LOOP WAS VECTORIZED
+LOOP END
+
+LOOP BEGIN at noncontiguous.f90(4,1)
+<Remainder loop for vectorization>
+LOOP END
+===========================================================================
+
+Begin optimization report for: FUNC1
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at noncontiguous.f90(12,1)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+LOOP END
+
+LOOP BEGIN at noncontiguous.f90(12,1)
+<Remainder>
+LOOP END
+===========================================================================

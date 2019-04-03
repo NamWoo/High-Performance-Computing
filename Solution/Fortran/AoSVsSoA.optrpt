@@ -1,0 +1,30 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+
+Begin optimization report for: AOS_SOA
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at AoSVsSoA.f90(19,1)
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization. First dependence is shown below. Use level 5 report for details
+LOOP END
+
+LOOP BEGIN at AoSVsSoA.f90(28,1)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at AoSVsSoA.f90(29,3)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+LOOP END
+
+LOOP BEGIN at AoSVsSoA.f90(37,1)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at AoSVsSoA.f90(38,3)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+LOOP END
+===========================================================================
