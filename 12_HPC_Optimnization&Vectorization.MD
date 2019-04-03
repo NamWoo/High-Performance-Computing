@@ -168,3 +168,58 @@ Traceback (most recent call last):
 IndexError: index 2 is out of bounds for axis 0 with size 2
 
 ```
+
+
+
+
+
+# 이틀날
+
+
+```python
+import numpy as np
+N = 100
+sz = (N,N)
+
+a = np.random.normal(size=sz)
+b = np.random.normal(size=sz)
+c = np.random.normal(size=sz)
+
+for i in range(N):
+    for j in range(N):
+        for k in range(N):
+            c[i][j] = c[i][j] + a[i][k] * b[k][j]
+
+
+print(c[1][1])
+```
+
+로긴노드에서
+```
+[sedu14@login02 tt]$ time python a.py
+11.509528133495884
+
+real    0m1.189s
+user    0m1.074s
+sys     0m0.069s
+```
+
+
+계산노드에서
+```
+[sedu14@login02 tt]$ qsub -I -V -l select=2:ncpus=68 -l walltime=04:00:00 -q debug
+qsub: waiting for job 2070858.pbs to start
+qsub: job 2070858.pbs ready
+
+[sedu14@node8282 tt]$ time python a.py
+2.8270135757179506
+
+real    0m11.327s
+user    0m8.954s
+sys     0m0.949s
+```
+
+
+확실히 로긴노드가 반응도 빠르고 속도도 엄청나게 빠름
+
+
