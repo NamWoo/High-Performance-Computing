@@ -5,3 +5,10 @@
 
 # 수치해석 라이브러리
 
+```
+/home01/sedu14/job_examples
+hybrid_mvapich2.sh  hybrid_openmpi.sh  mpi.sh  openmp.sh  serial.sh
+
+
+[sedu14@node8284 ee]$ echo $LD_LIBRARY_PATH
+```
