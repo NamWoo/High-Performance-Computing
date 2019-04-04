@@ -9,6 +9,35 @@
 /home01/sedu14/job_examples
 hybrid_mvapich2.sh  hybrid_openmpi.sh  mpi.sh  openmp.sh  serial.sh
 
-
 [sedu14@node8284 ee]$ echo $LD_LIBRARY_PATH
 ```
+
+```fortran
+program a
+implicit none
+integer::i
+integer, parameter::n=6
+real::x(n), y(n)
+real::sdot,snrm2
+do i= 1,n
+        x(i)=real(i)
+        y(i)=0.0
+end do
+call scopy(3,x,2,y,2)
+print*, 'scopy:x=',x
+print*, 'scopy:y=',y
+call saxpy(n,2.0,x,1,y,1)
+print*, 'saxpy:x=',x
+print*, 'saxpy:y=',y
+print*, 'norm2:x=',snrm2(n,x,1)
+print*, 'norm2:y=',snrm2(n,y,1)
+print*, 'x dot y:',sdot(n,x,1,y,1)
+end program a
+```
+
+
+```
+[sedu14@login04 ee]$ gfortran a.f90 -o a.x -L/apps/compiler/gcc/7.2.0/applib1/mic-knl/lapack/3.7.0 -lblas
+```
+
+
