@@ -10,6 +10,9 @@
 hybrid_mvapich2.sh  hybrid_openmpi.sh  mpi.sh  openmp.sh  serial.sh
 
 [sedu14@node8284 ee]$ echo $LD_LIBRARY_PATH
+
+/opt/cray/lib64:/apps/compiler/gcc/7.2.0/openmpi/3.1.0/applib2/mic-knl/fftw_mpi/3.3.7/lib:/apps/compiler/gcc/7.2.0/openmpi/3.1.0/lib:/apps/compiler/gcc/7.2.0/applib1/mic-knl/lapack/3.7.0:/apps/compiler/gcc/7.2.0/lib64:/apps/compiler/gcc/7.2.0/lib/gcc/x86_64-unknown-linux-gnu/7.2.0:/apps/common/gmp/6.1.2/lib:/apps/common/mpfr/4.0.1/lib:/apps/common/mpc/1.1.0/lib:/opt/cray/lib64:
+
 ```
 
 ```fortran
