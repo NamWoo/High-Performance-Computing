@@ -115,3 +115,58 @@ user    0m0.012s
 sys     0m0.015s
 
 ```
+
+```fortran
+program c
+implicit none
+integer::i,j
+integer, parameter::n=2
+real::alpha, beta
+real:: a1(n,n), b1(n,n), c1(n,n), a2(n,n), b2(n,n), c2(n,n)
+complex::alpha3, beta3
+complex::a3(n,n),b3(n,n),c3(n,n)
+data a1 /1.0,1.0,1.0,2.0/, b2 /2.0,1.0,1.0,3.0/, c1 /1.0,1.0,1.0,1.0/
+data a2 /1.0,1.0,1.0,2.0/, b2 /2.0,1.0,1.0,3.0/, c1 /1.0,1.0,1.0,1.0/
+data a3 /(1.0, 0.0), (0.0, 0.0), (1.0, 1.0), (2.0, 0.0)/
+data b3 /(2.0, 0.0),(0.0,0.0), (0.0,1.0),(3.0,0.0)/
+data c3 /(1.0, 0.0),(1.0,0.0), (1.0,1.0),(1.0,0.0)/
+alpha=1; beta=1
+alpha3=(1.0,0.0); beta3=(1.0,0.0)
+call sgemm('n',n,n,n,alpha,a1,n,beta,c1,n)
+print*, 'sgemm:c='
+do i=1,n
+        print*,:
+        x(i)=real(i)
+        y(i)=real(i+2)
+end do
+
+print*, 'initial:x=',x
+print*, 'initial:y=',y
+print*, 'initial:a='
+
+do i= 1,n
+        print*, (a(i,j),j=1,n)
+end do
+
+call sgemv('n',n,n,alpha,a,n,x,1,beta,y,1)
+print*, 'sgemv:x=',x
+print*, 'sgemv:y=',y
+print*, 'sgemv:a'
+do i=1,n
+        print*,(a(i,j),j=1,n)
+end do
+
+call sger(n,n,alpha,x,1,y,1,a,n)
+print*, 'sger:x=',x
+print*, 'sger:y=',y
+print*, 'sger:a'
+
+do i=1,n
+        print*,(a(i,j),j=1,n)
+end do
+end program b
+```
+
+## LAPACK
+
+
