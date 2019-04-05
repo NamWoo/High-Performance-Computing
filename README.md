@@ -17,20 +17,20 @@
 
 그 가운데 내가 있었으니 나는 참 뭐하고 있는지 많은 생각을 했지만서도.. ㅎㅎ 열심히 배워보려 노력했다.
 
-| 순서 | 의미 |
+| 순서 | 설명 |
 |---|:---:|
-|1. HPC_Training|||
-|2. HPC_System_Operation||
-|3. HPC_Linux_Training||
-|4. HPC_FORTRAN||
-|5. HPC_Multiprocessing||
-|6. HPC_OpenMP_Basic||
-|8. HPC_MPI_Basic||
-|9. HPC_Hybrid_Programming||
-|10. HPC_MPI_Advanced||
-|11. HPC_Python||
-|12. HPC_Optimnization & Vectorization||
-|13. HPC_Scientific_Libraries||
+|1. HPC_Training||
+|2. HPC_System_Operation|관리, 운영|
+|3. HPC_Linux_Training|리눅스 사용|
+|4. HPC_FORTRAN|포트란 사용|
+|5. HPC_Multiprocessing|병렬프로그래밍|
+|6. HPC_OpenMP_Basic|OpenMP 기본과정|
+|8. HPC_MPI_Basic|MPI 기본과정|
+|9. HPC_Hybrid_Programming|openMP와 MPI의 하이브리드|
+|10. HPC_MPI_Advanced|MPI 고급과정|
+|11. HPC_Python|파이썬은 어떻게?|
+|12. HPC_Optimnization & Vectorization|최적화와 벡터화|
+|13. HPC_Scientific_Libraries|수치해석 라이브러리|
 
 
 
